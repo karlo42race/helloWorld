@@ -17,6 +17,7 @@
     "indexof": "0.0.1",
     "meteor-node-stubs": "~0.2.4",
     "moment": "^2.18.1",
+    "moment-timezone-with-data-2010-2020": "^0.4.0",
     "prerender-node": "^2.5.0",
     "react": "^15.4.2",
     "react-addons-pure-render-mixin": "^15.0.1",
