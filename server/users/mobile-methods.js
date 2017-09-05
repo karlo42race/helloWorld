@@ -14,7 +14,8 @@ Meteor.methods({
 		};
 
 		let oneUser =  Meteor.users.findOne({publicID: user_publicID}, { fields: fields } );
-		let oneFollowing = Following.find({'idol_publicID': user_publicID, 'userID': this.userId});
+		let oneFollowing = Following.findOne({'idol_publicID': user_publicID, 'userID': this.userId});
+
 		let isFollowing = oneFollowing ? true : false;
 
 		let fansCount = Following.find({'idol_publicID': user_publicID}).count();
