@@ -24,10 +24,8 @@ class TestPage extends Component {
 		})
 	}
 
-	getData() {
-		let publicID = document.getElementById('publicID').value;
-		console.log('id', publicID);
-		Meteor.call('users.getPublicUserData', publicID, (err, res) => {
+	getData() {		
+		Meteor.call('users.getOwnUserData', (err, res) => {
 			if(err) {
 				console.log(err.reason);
 				alert(err.reason)
