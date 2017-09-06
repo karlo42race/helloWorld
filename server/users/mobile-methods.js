@@ -1,5 +1,5 @@
 import { check, Match } from 'meteor/check';
-import { Following, UserMeta } from '/imports/api/collections.js';
+import { AllResults, Following, UserMeta, VirtualRaces } from '/imports/api/collections.js';
 
 Meteor.methods({
 	// for client mobile app login via facebook method
@@ -69,13 +69,34 @@ Meteor.methods({
 		let fansCount = Following.find({'idol_userID': this.userId}).count();
 		let idolCount = Following.find({'userID': this.userId}).count();	
 
-		let data = oneUser;
+		let data = oneUser;				
+		
+		// get badges url
+		let results = AllResults.find({userID: this.userId}).fetch();
+		let badges = [];
+
+		_.each(results, (c) => {
+			let { race_type, distance, category, raceID, _id } = c;
+			if(race_type == 'virtual_race') {
+				if(distance >= category) {
+					let oneRace = VirtualRaces.findOne({_id: raceID});
+					badges.push(oneRace.badge_color);					
+				}
+			} else if (race_type == 'challenge') {
+				if(distance >= 20) {
+					let oneRace = VirtualRaces.findOne({_id: raceID});
+					badges.push(oneRace.badge_color);					
+				}
+			};						
+		});	
+
 		Object.assign(data, {
     	fansCount,
     	idolCount,
     	total_distance,
 			total_timing,
-			submissions_count
+			submissions_count,
+			badges
     });
 
     return data;
