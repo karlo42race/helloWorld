@@ -102,5 +102,43 @@ Meteor.methods({
     return data;
 
 	},
+
+	'users.getOwnBadges'() {
+		let results = AllResults.find({userID: this.userId}).fetch();
+		let data = [];
+
+		const pushData = (oneResult) => {
+			let { race, race_type, distance, category, raceID, timing_per_km, position } = oneResult;
+			let oneRace = VirtualRaces.findOne({_id: raceID});
+			let badge = oneRace.badge_color;
+			let oneData = {
+				race,
+				race_type,
+				distance,
+				category,
+				timing_per_km,
+				position,
+				badge
+			}
+			data.push(oneData);			
+		}
+
+		// get result details and push as object
+		_.each(results, (c) => {
+			let { race, race_type, distance, category, raceID, timing_per_km, position } = c;
+			if(race_type == 'virtual_race') {
+				if(distance >= category) {
+					pushData(c);
+				}
+			} else if (race_type == 'challenge') {
+				if(distance >= 20) {
+					pushData(c);
+				}
+			};						
+		});	
+
+		return data;
+
+	},
 	
 });

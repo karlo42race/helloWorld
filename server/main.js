@@ -11,7 +11,7 @@ import { UserNumber } from '/imports/api/collections';
 Meteor.startup(() => {    
   // change reset password url
   Accounts.urls.resetPassword = function(token) {    
-    return Meteor.absoluteUrl('reset-password/' + token);
+    return Meteor.absoluteUrl(`reset-password/${token}`, {rootUrl: "https://web.42race.com"});
   };  
   Accounts.emailTemplates.siteName = '42Race';  
   Accounts.emailTemplates.resetPassword.from = () => {
