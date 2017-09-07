@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
+import { ReactiveVar } from 'meteor/reactive-var';
 import { createContainer } from 'meteor/react-meteor-data';
+
+const currentPage = new ReactiveVar(0);
 
 class TestPage extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			user: {}
+			data: {}
 		}
 	}
 
@@ -24,20 +27,29 @@ class TestPage extends Component {
 		})
 	}
 
-	getData() {		
-		Meteor.call('users.getBadges', 11000, (err, res) => {
+	getData() {
+		let page = currentPage.get();
+		let dataLimit = 10;
+		let skipCount = dataLimit * page;
+		
+		Meteor.call('submissions.getPublicSubmissions', skipCount, 'highlights', (err, res) => {
 			if(err) {
 				console.log(err.reason);
 				alert(err.reason)
 			} else {
 				console.log(res);
-				this.setState({user: res});
+				this.setState({data: res});
 			}
 		})
 	}
 
+	nextPage() {		
+		let nextPage = currentPage.get() + 1;
+		currentPage.set(nextPage);
+	}
+
 	render() {
-		console.log(this.state.user);
+		console.log(this.state.data);
 
 		return(
 			<div>
@@ -46,7 +58,8 @@ class TestPage extends Component {
 				<button onClick={this.login.bind(this)}>Enter</button>
 				<br/>
 				<input type="number" id="publicID"/>
-				<button onClick={this.getData.bind(this)}>Test</button>				
+				<button onClick={this.getData.bind(this)}>Test</button>
+				<button onClick={this.nextPage.bind(this)}>Next</button>	
 			</div>
 		)
 	}
