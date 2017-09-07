@@ -32,7 +32,12 @@ class TestPage extends Component {
 		let dataLimit = 10;
 		let skipCount = dataLimit * page;
 		
-		Meteor.call('submissions.getPublicSubmissions', skipCount, 'highlights', (err, res) => {
+		let race = "Easter Run",
+				limit = 10,
+				category = "3",
+				elite = 0;
+
+		Meteor.call('results.getRanking', race, limit, category, elite, (err, res) => {
 			if(err) {
 				console.log(err.reason);
 				alert(err.reason)
