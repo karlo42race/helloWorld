@@ -25,7 +25,7 @@ class TestPage extends Component {
 	}
 
 	getData() {		
-		Meteor.call('users.getOwnBadges', (err, res) => {
+		Meteor.call('users.getBadges', 11000, (err, res) => {
 			if(err) {
 				console.log(err.reason);
 				alert(err.reason)

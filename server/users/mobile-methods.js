@@ -103,8 +103,8 @@ Meteor.methods({
 
 	},
 
-	'users.getOwnBadges'() {
-		let results = AllResults.find({userID: this.userId}).fetch();
+	'users.getBadges'(publicID) {
+		let results = AllResults.find({bib_number: publicID}).fetch();
 		let data = [];
 
 		const pushData = (oneResult) => {
