@@ -104,6 +104,7 @@ Meteor.methods({
 	},
 
 	'users.getBadges'(publicID) {
+		check(publicID, Number);
 		let results = AllResults.find({bib_number: publicID}).fetch();
 		let data = [];
 
@@ -140,5 +141,9 @@ Meteor.methods({
 		return data;
 
 	},
+
+	'users.getNotifications'() {
+
+	}
 	
 });

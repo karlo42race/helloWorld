@@ -13,6 +13,7 @@ Meteor.methods({
 		const pushOneData = (c) => {
 		 	let oneUser = Meteor.users.findOne({_id: c.userID});		 	
 		 	let oneData = {
+		 		_id: c._id,
 		 		user_name: c.user_name, 
 				userID: c.userID,
 				user_publicID: c.user_publicID,
