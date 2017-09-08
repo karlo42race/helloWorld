@@ -80,12 +80,14 @@ Meteor.methods({
 			if(race_type == 'virtual_race') {
 				if(distance >= category) {
 					let oneRace = VirtualRaces.findOne({_id: raceID});
-					badges.push(oneRace.badge_color);					
+					let badge = oneRace ? oneRace.badge_color : "";
+					badges.push(badge);
 				}
 			} else if (race_type == 'challenge') {
 				if(distance >= 20) {
 					let oneRace = VirtualRaces.findOne({_id: raceID});
-					badges.push(oneRace.badge_color);					
+					let badge = oneRace ? oneRace.badge_color : "";
+					badges.push(badge);
 				}
 			};						
 		});	
@@ -111,7 +113,7 @@ Meteor.methods({
 		const pushData = (oneResult) => {
 			let { race, race_type, distance, category, raceID, timing_per_km, position } = oneResult;
 			let oneRace = VirtualRaces.findOne({_id: raceID});
-			let badge = oneRace.badge_color;
+			let badge = oneRace ? oneRace.badge_color : "";
 			let oneData = {
 				race,
 				race_type,
@@ -158,9 +160,10 @@ Meteor.methods({
 		_.each(notifications, (c) => {
 			let oneUser = Meteor.users.findOne({_id: c.notifier_userID});		
 			let oneData = c;
+			let profilePic = oneUser ? oneUser.profilePic : "";
 
 			Object.assign(oneData, {
-	    	profilePic: oneUser.profilePic
+	    	profilePic
 	    });
 	    data.push(oneData);
 		});

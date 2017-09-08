@@ -29,15 +29,12 @@ class TestPage extends Component {
 
 	getData() {
 		let page = currentPage.get();
-		let dataLimit = 10;
-		let skipCount = dataLimit * page;
 		
-		let race = "wonderpet",
+		let race = "SMxHbDXva3z749Gqu",
 				limit = 10,
-				category = "3",
-				elite = 0;
-
-		Meteor.call('users.getNotifications', 50, limit, category, elite, (err, res) => {
+				skipCount = 0
+				
+		Meteor.call('comments.getOneSubmissionComments', race, limit, skipCount, (err, res) => {
 			if(err) {
 				console.log(err.reason);
 				alert(err.reason)
