@@ -37,7 +37,7 @@ class TestPage extends Component {
 				category = "3",
 				elite = 0;
 
-		Meteor.call('results.getRanking', race, limit, category, elite, (err, res) => {
+		Meteor.call('results.getUserRanking', race, limit, category, elite, (err, res) => {
 			if(err) {
 				console.log(err.reason);
 				alert(err.reason)

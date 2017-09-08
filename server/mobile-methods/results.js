@@ -1,7 +1,37 @@
 import { check, Match } from 'meteor/check';
 import { AllResults } from '/imports/api/collections.js';
 
+const getOneData = (c) => {
+	let { race, user_name, user_email, timing, distance, position, category, bib_number, timing_per_km, team, gender, userID } = c;
+	let oneUser = Meteor.users.findOne({_id: userID});
+	let oneData = {
+		race, 
+		user_name, 
+		user_email, 
+		timing, 
+		distance, 
+		position, 
+		category, 
+		bib_number, 
+		timing_per_km, 
+		team, 
+		gender, 
+		userID, 
+		profilePic: oneUser.profilePic
+	};
+
+	return oneData;
+};
+
 Meteor.methods({
+	// get ranking for a race for user only
+	'results.getUserRanking'(race) {
+		let userResult = AllResults.findOne({ race: race, userID: this.userId });
+		let userData = getOneData(userResult);
+		return userData;
+	},
+
+	// get ranking table for a race 
 	'results.getRanking'(race, limit, category, elite) {
 		let data = [];
 		
@@ -25,41 +55,13 @@ Meteor.methods({
 		}; 
 
 		let results = AllResults.find({ $and : [findFilter] }, options).fetch();
-
-		const getOneData = (c) => {
-			let { race, user_name, user_email, timing, distance, position, category, bib_number, timing_per_km, team, gender, userID } = c;
-			let oneUser = Meteor.users.findOne({_id: userID});
-			let oneData = {
-				race, 
-				user_name, 
-				user_email, 
-				timing, 
-				distance, 
-				position, 
-				category, 
-				bib_number, 
-				timing_per_km, 
-				team, 
-				gender, 
-				userID, 
-				profilePic: oneUser.profilePic
-			};
-
-			return oneData;
-		};
-
+		
 		_.each(results, (c) => {
 			let oneData = getOneData(c);
 			data.push(oneData);
 		});
 
-		let userResult = AllResults.findOne({ race: race, userID: this.userId });
-		let userData = getOneData(userResult);		
-
-		return [
-			data, 
-			userData
-		];
+		return data;
 
 	},
 
