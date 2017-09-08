@@ -37,7 +37,7 @@ class TestPage extends Component {
 				category = "3",
 				elite = 0;
 
-		Meteor.call('virtualRaces.getOneRace', race, limit, category, elite, (err, res) => {
+		Meteor.call('users.getNotifications', 50, limit, category, elite, (err, res) => {
 			if(err) {
 				console.log(err.reason);
 				alert(err.reason)

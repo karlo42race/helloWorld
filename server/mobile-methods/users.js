@@ -1,5 +1,5 @@
 import { check, Match } from 'meteor/check';
-import { AllResults, Following, UserMeta, VirtualRaces } from '/imports/api/collections.js';
+import { AllResults, Following, Notifications, UserMeta, VirtualRaces } from '/imports/api/collections.js';
 
 Meteor.methods({
 	// for client mobile app login via facebook method
@@ -142,8 +142,30 @@ Meteor.methods({
 
 	},
 
-	'users.getNotifications'() {
+	'users.getNotifications'(limit, skipCount) {
+		check(skipCount, Number);
+		check(limit, Number);
 
-	}
+		let data = [];
+		let options = {
+			limit,
+			skip: skipCount,
+			sort: {createdAt: -1}
+		};
+
+		let notifications = Notifications.find({userID: this.userId}, options ).fetch();
+
+		_.each(notifications, (c) => {
+			let oneUser = Meteor.users.findOne({_id: c.notifier_userID});		
+			let oneData = c;
+
+			Object.assign(oneData, {
+	    	profilePic: oneUser.profilePic
+	    });
+	    data.push(oneData);
+		});
+		
+		return data;
+	},
 	
 });
