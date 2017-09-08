@@ -46,7 +46,7 @@ Meteor.methods({
 		    return following.idol_userID;
 		  });
 
-		  submisisons = Submissions.find({userID: {$in: idol_userIDs} }, options).fetch();	
+		  submissions = Submissions.find({userID: {$in: idol_userIDs} }, options).fetch();	
 		};
 
 		_.each(submissions, (c) => {

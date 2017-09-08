@@ -32,12 +32,12 @@ class TestPage extends Component {
 		let dataLimit = 10;
 		let skipCount = dataLimit * page;
 		
-		let race = "Easter Run",
+		let race = "wonderpet",
 				limit = 10,
 				category = "3",
 				elite = 0;
 
-		Meteor.call('results.getUserRanking', race, limit, category, elite, (err, res) => {
+		Meteor.call('virtualRaces.getOneRace', race, limit, category, elite, (err, res) => {
 			if(err) {
 				console.log(err.reason);
 				alert(err.reason)

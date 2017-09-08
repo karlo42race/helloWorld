@@ -32,11 +32,12 @@ Meteor.methods({
 	},
 
 	// get ranking table for a race 
-	'results.getRanking'(race, limit, category, elite) {
+	'results.getRanking'(race, limit, skipCount, category, elite) {
 		let data = [];
 		
 		let options = {
 			limit: limit,
+			skip: skipCount,
 			sort: { position: 1 }
 		};
 
