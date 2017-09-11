@@ -171,4 +171,27 @@ Meteor.methods({
 		return data;
 	},
 	
+	// get list of users from an array of userID, e.g. people who like a submission
+	'users.getUsersFromArray'(userArray) {
+		check(userArray, Array);
+
+		let data = [];
+		let fields = {
+			"profile.name": 1,
+			profilePic: 1,
+			publicID: 1
+		};
+
+		_.each(userArray, (c) => {
+			let oneUser = Meteor.users.findOne({_id: c}, { fields: fields });
+			
+			if(oneUser) 
+				data.push(oneUser);			
+
+		});
+
+		return data;
+
+	},
+	
 });
