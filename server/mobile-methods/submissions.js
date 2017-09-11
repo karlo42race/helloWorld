@@ -2,6 +2,7 @@ import { check, Match } from 'meteor/check';
 import { AllResults, Submissions, Comments, Following } from '/imports/api/collections.js';
 
 Meteor.methods({
+	// for feeds and following
 	'submissions.getPublicSubmissions'(skipCount, type) {
 		let options = {
 			limit: 10,
@@ -56,6 +57,19 @@ Meteor.methods({
 
 		return data;
 		
+	},
+
+	// for user's log and public user's log
+	'submissions.getUserLog'(publicID, skipCount) {
+		let options = {
+			limit: 10,
+			skip: skipCount,
+			sort: {createdAt: -1},
+		};		
+
+		let submissions = Submissions.find({user_publicID: publicID}, options).fetch();
+
+		return submissions;
 	},
 
 })

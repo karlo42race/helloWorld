@@ -34,7 +34,7 @@ class TestPage extends Component {
 				limit = 10,
 				skipCount = 0
 				
-		Meteor.call('comments.getOneSubmissionComments', race, limit, skipCount, (err, res) => {
+		Meteor.call('submissions.getUserLog', 11000, skipCount, (err, res) => {
 			if(err) {
 				console.log(err.reason);
 				alert(err.reason)
