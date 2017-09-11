@@ -72,4 +72,22 @@ Meteor.methods({
 		return submissions;
 	},
 
+	// get one submission 
+	'submissions.getOneSubmission'(submissionID) {
+		check(submissionID, String);
+
+		let oneSubmission = Submissions.findOne({_id: submissionID});
+		if(oneSubmission) {
+			let oneUser = Meteor.users.findOne({_id: oneSubmission.userID});
+			let profilePic = oneUser ? oneUser.profilePic : "";
+
+			Object.assign(oneSubmission, {
+				profilePic
+			});
+			
+			return oneSubmission;
+		};
+
+	},
+
 })

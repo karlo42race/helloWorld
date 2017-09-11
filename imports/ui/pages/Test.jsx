@@ -30,12 +30,12 @@ class TestPage extends Component {
 	getData() {
 		let page = currentPage.get();
 		
-		let race = "SMxHbDXva3z749Gqu",
+		let race = "27foC6M7TXLGLMj9m",
 				limit = 10,
 				skipCount = 0,
 				userArray = ["LadPXDt6urSre2k3o", "s8tWQPTJGdEzWdf8a"]
 				
-		Meteor.call('users.getUsersFromArray', userArray, (err, res) => {
+		Meteor.call('submissions.getOneSubmission', race, limit, skipCount, (err, res) => {
 			if(err) {
 				console.log(err.reason);
 				alert(err.reason)
