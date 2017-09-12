@@ -35,7 +35,7 @@ class TestPage extends Component {
 				skipCount = 0,
 				userArray = ["LadPXDt6urSre2k3o", "s8tWQPTJGdEzWdf8a"]
 				
-		Meteor.call('submissions.getOneSubmission', race, limit, skipCount, (err, res) => {
+		Meteor.call('results.getUserResults', skipCount, (err, res) => {
 			if(err) {
 				console.log(err.reason);
 				alert(err.reason)
