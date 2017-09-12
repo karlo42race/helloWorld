@@ -24,8 +24,8 @@ Meteor.methods({	 // payment using stripe
 		let { email, priceInCents, currency, addonArray } = values;
 		let { profile } = currentUser;
 		let userId = this.userId;
-		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);
-				
+		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);			
+
 		// check email exists
 		if(!email || (email == ''))
 			throw new Meteor.Error('no-email', 'Error: no email, add email on your dashboard');
@@ -52,7 +52,7 @@ Meteor.methods({	 // payment using stripe
 			values['status'] = 'paid';
 			let checkout_url = null;
 			// check if there is addon
-			if(addonArray.length > 0) {
+			if(addonArray && addonArray.length > 0) {
 				// add on stuff
 				let addonText = '';
 				// [{'item', 'variable', 'price'}, {...}]
