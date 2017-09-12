@@ -3,7 +3,20 @@ import { AllResults, VirtualRaces } from '/imports/api/collections.js';
 
 const getOneData = (c) => {
 	let { race, user_name, user_email, timing, distance, position, category, bib_number, timing_per_km, team, gender, userID } = c;
-	let oneUser = Meteor.users.findOne({_id: userID});
+
+	let profilePic = [];
+
+	// for multiple partner races
+	if(Array.isArray(userID)) {
+		_.each(userID, (u) => {
+			let oneUser = Meteor.users.findOne({_id: u});	
+			profilePic.push(oneUser.profilePic);
+		})
+	} else {
+		let oneUser = Meteor.users.findOne({_id: userID});
+		profilePic = oneUser.profilePic;
+	}
+	
 	let oneData = {
 		race, 
 		user_name, 
@@ -17,7 +30,7 @@ const getOneData = (c) => {
 		team, 
 		gender, 
 		userID, 
-		profilePic: oneUser.profilePic
+		profilePic
 	};
 
 	return oneData;
