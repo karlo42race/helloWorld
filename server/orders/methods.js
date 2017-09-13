@@ -5,6 +5,7 @@ import {
 	createChargeOnStripe,
 	checkAddonCountry,
 	checkOrder,
+	checkPrice,
 	checkResult,
 	createOrder,
 	formatDate,
