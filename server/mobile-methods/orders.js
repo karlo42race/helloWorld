@@ -4,17 +4,19 @@ import {
 	toId,
 	racePriceSg,
 	racePriceMy,
-	racePriceId
-} from '../orders/modules/order-helpers';
+	racePriceId,
+	selectCountry
+} from '/imports/api/options.js';
 
 Meteor.methods({	
-	'orders.getCurrencyConversion'() {
+	'orders.getCurrencyConversion'() {		
 		let data = {
 			toMyr,
 			toId,
 			racePriceSg,
 			racePriceMy,
 			racePriceId,
+			selectCountry
 		};
 
 		return data;

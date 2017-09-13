@@ -1,14 +1,16 @@
 import { check } from 'meteor/check';
 import { Orders, OrderNumber, ProductItems, AllResults, Teams, VirtualRaces } from '/imports/api/collections.js';
+import {
+	toMyr,
+	toId,
+	racePriceSg,
+	racePriceMy,
+	racePriceId,
+	selectCountry
+} from '/imports/api/options';
 
 // stripe
 const Stripe = require("stripe")("sk_live_TEPWTflfLxs5O8RzQXjqhnRx");
-
-const toMyr = 3.2;
-const toId = 9900;
-const racePriceSg = 9.90;
-const racePriceMy = 29.90;
-const racePriceId = 99900;
 
 const createChargeOnStripe = (options) => {
 	return new Promise((resolve, reject) => {
@@ -59,12 +61,16 @@ const checkPrice = ( values, race_name ) => {
 	// check priceInCents and price tally
 	if(price*100 !== priceInCents)
 		throw new Meteor.Error('price-unequal', 'Error: Price in cents not correct');
-
+		
 	_.each(addonArray, (c) => {
 		let { item } = c;
 		let oneProduct = ProductItems.findOne({ race: race_name, item_name: item });		
 		subTotal += oneProduct.price; // in SGD
 	});
+
+	// add country delivery cost
+	let countryDeliveryCost = getDeliveryCost(country);
+	subTotal += countryDeliveryCost 
 
 	switch (country) {
 		case 'Malaysia':
@@ -76,7 +82,7 @@ const checkPrice = ( values, race_name ) => {
 		default:
 			total = subTotal + racePriceSg;
 			break;
-	};	
+	};
 
 	if(price !== total)
 		throw new Meteor.Error('price-error', 'Error: Total price is incorrect');
@@ -206,6 +212,16 @@ const addTeamCount = (raceID, team) => {
 
 		console.log('AllResults: team updated');
 	};
+}
+
+// get cost of delivery
+const getDeliveryCost = (country) => {
+	let checkDeliveryCountryObj = selectCountry.find(x => x.country === country);
+	if(checkDeliveryCountryObj) {
+		return checkDeliveryCountryObj.deliveryFee;
+	} else {
+		return 0;
+	}
 }
 
 // minus category stock if order succeed
