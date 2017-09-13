@@ -89,7 +89,7 @@ const checkPrice = ( values, race_name ) => {
 	// fix to 2 decimal
 	totalFix = parseInt(total*100)/100;
 
-	if(price !== total) {
+	if(price !== totalFix) {
 		console.warn(`Error: price ${price} !== total ${totalFix}, typeOf price: ${typeof(price)}, typeOf total: ${typeof(totalFix)}`);
 		throw new Meteor.Error('price-error', 'Error: Total price is incorrect');
 	}

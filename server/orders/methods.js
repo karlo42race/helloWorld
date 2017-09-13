@@ -56,17 +56,26 @@ Meteor.methods({	 // payment using stripe
 			if(addonArray && addonArray.length > 0) {
 				// add on stuff
 				let addonText = '';
+
 				// [{'item', 'variable', 'price'}, {...}]
 				// convert addonArray to 'item - variable: price'				
+				// for mobile, price of addon already converted to local currency
+				// !IMPORTANT ONLY FOR MOBILE
 				_.each(addonArray, (c) => {
 					let { variable, item, price } = c;
 					let priceToShow = price;
 
-					let showCurrency = '$';
-					if(currency == 'myr') {
-						showCurrency = 'RM';
-						priceToShow = price * toMyr;
-					}
+					let showCurrency = 'S$';
+					switch (currency) {
+						case 'myr': 
+							showCurrency = 'RM';
+							break;
+						case 'idr': 
+							showCurrency = 'Rp';
+							break;
+						default: 
+							break;
+					};					
 										
 					let variableText = '';
 					if (variable) 
