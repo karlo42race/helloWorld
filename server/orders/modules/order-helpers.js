@@ -59,8 +59,10 @@ const checkPrice = ( values, race_name ) => {
 	let subTotal = 0;
 	let total;
 	// check priceInCents and price tally
-	if(price*100 !== priceInCents)
+	if(price*100 !== priceInCents) {
+		console.log(`Error: price: ${price} !== priceInCents: ${priceInCents}`);
 		throw new Meteor.Error('price-unequal', 'Error: Price in cents not correct');
+	};
 		
 	_.each(addonArray, (c) => {
 		let { item } = c;
