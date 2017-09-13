@@ -35,7 +35,7 @@ class TestPage extends Component {
 				skipCount = 0,
 				userArray = ["LadPXDt6urSre2k3o", "s8tWQPTJGdEzWdf8a"]
 				
-		Meteor.call('results.getUserResults', skipCount, (err, res) => {
+		Meteor.call('orders.getCurrencyConversion', skipCount, (err, res) => {
 			if(err) {
 				console.log(err.reason);
 				alert(err.reason)
