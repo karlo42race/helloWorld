@@ -4,6 +4,12 @@ import { Orders, OrderNumber, ProductItems, AllResults, Teams, VirtualRaces } fr
 // stripe
 const Stripe = require("stripe")("sk_live_TEPWTflfLxs5O8RzQXjqhnRx");
 
+const toMyr = 3.2;
+const toId = 9900;
+const racePriceSg = 9.90;
+const racePriceMy = 29.90;
+const racePriceId = 99900;
+
 const createChargeOnStripe = (options) => {
 	return new Promise((resolve, reject) => {
 		Stripe.charges.create(options, (error, response) => {
@@ -43,7 +49,39 @@ const checkOrder = ( userID, raceData ) => {
 		console.log('Error: User', userID, 'already registered for', race_name);
 		throw new Meteor.Error('already-registered', `Registration failed. ${orderExists.user_name} have already registered for this run`)
 	};
-}
+};
+
+// check if total price is correct
+const checkPrice = ( values, race_name ) => {	
+	let { country, addonArray, price, priceInCents } = values;
+	let subTotal = 0;
+	let total;
+	// check priceInCents and price tally
+	if(price*100 !== priceInCents)
+		throw new Meteor.Error('price-unequal', 'Error: Price in cents not correct');
+
+	_.each(addonArray, (c) => {
+		let { item } = c;
+		let oneProduct = ProductItems.findOne({ race: race_name, item_name: item });		
+		subTotal += oneProduct.price; // in SGD
+	});
+
+	switch (country) {
+		case 'Malaysia':
+			total = subTotal*toMyr + racePriceMy;
+			break;
+		case 'Indonesia':
+			total = subTotal*toId + racePriceId;
+			break;
+		default:
+			total = subTotal + racePriceSg;
+			break;
+	};	
+
+	if(price !== total)
+		throw new Meteor.Error('price-error', 'Error: Total price is incorrect');
+
+};
 
 // create order
 const createOrder = (raceData, values, currentUser, orderNum, checkout_url) => {
@@ -387,5 +425,10 @@ export {
 	returnStockByOrderNum,
 	sendEmailToAdmin,
 	sendEmailToUser,
-	createPAOrder
+	createPAOrder,
+	toMyr,
+	toId,
+	racePriceSg,
+	racePriceMy,
+	racePriceId
 };

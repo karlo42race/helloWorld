@@ -14,9 +14,8 @@ import {
 	takeStock,
 	sendEmailToAdmin,
 	sendEmailToUser,
-	createPAOrder } from './modules/order-helpers';
-
-const toMyr = 3.2;
+	createPAOrder,
+	toMyr } from './modules/order-helpers';
 
 Meteor.methods({	 // payment using stripe 
 	'orders.create'(raceData, currentUser, values, token) {		
@@ -33,6 +32,7 @@ Meteor.methods({	 // payment using stripe
 		check(token.id, String); // check stripeToken is string
 		checkOrder( userId, raceData );	// check if user has register for race
 		checkAddonCountry(addonArray, values, race_name); // check if addon can be delivered to shipping country
+		checkPrice(values, race_name); // check if price is correct
 
 		let orderTimestamp = formatDate(new Date());		
     let orderNum = getOrderNumber(); // get order number 

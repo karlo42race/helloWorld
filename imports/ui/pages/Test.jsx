@@ -34,16 +34,21 @@ class TestPage extends Component {
 				limit = 10,
 				skipCount = 0,
 				userArray = ["LadPXDt6urSre2k3o", "s8tWQPTJGdEzWdf8a"]
-				
-		Meteor.call('orders.getCurrencyConversion', skipCount, (err, res) => {
-			if(err) {
-				console.log(err.reason);
-				alert(err.reason)
-			} else {
-				console.log(res);
-				this.setState({data: res});
-			}
-		})
+		
+		if(Roles.userIsInRole(Meteor.user(), ['admin']) ) {
+			Meteor.call('orders.getCurrencyConversion', skipCount, (err, res) => {
+				if(err) {
+					console.log(err.reason);
+					alert(err.reason)
+				} else {
+					console.log(res);
+					this.setState({data: res});
+				}
+			});
+			
+		} else {
+			alert('Test clicked');
+		};
 	}
 
 	nextPage() {		
