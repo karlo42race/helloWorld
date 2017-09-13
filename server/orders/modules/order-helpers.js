@@ -60,7 +60,7 @@ const checkPrice = ( values, race_name ) => {
 	let total;
 	// check priceInCents and price tally
 	if(price*100 !== priceInCents) {
-		console.log(`Error: price: ${price} !== priceInCents: ${priceInCents}`);
+		console.warn(`Error: price: ${price} !== priceInCents: ${priceInCents}`);
 		throw new Meteor.Error('price-unequal', 'Error: Price in cents not correct');
 	};
 		
@@ -86,8 +86,10 @@ const checkPrice = ( values, race_name ) => {
 			break;
 	};
 
-	if(price !== total)
+	if(price !== total) {
+		console.warn(`Error: price ${price} !== total ${total}`);
 		throw new Meteor.Error('price-error', 'Error: Total price is incorrect');
+	}
 
 };
 
