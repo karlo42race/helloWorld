@@ -32,8 +32,7 @@ Meteor.methods({
 			'profilePic': 1, 
 			'motto': 1, 
 			'publicID': 1,		
-			'badges': 1,
-			'roles': 1
+			'badges': 1			
 		};
 
 		let oneUser =  Meteor.users.findOne({publicID: user_publicID}, { fields: fields } );
@@ -61,7 +60,8 @@ Meteor.methods({
 			'profilePic': 1, 
 			'motto': 1, 
 			'publicID': 1,
-			'message': 1			
+			'message': 1,
+			'roles': 1
 		}
 		let oneUserMeta = UserMeta.findOne({ userID: this.userId }, {fields: {} });
 		let { total_distance, total_timing, submissions_count } = oneUserMeta;

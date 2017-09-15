@@ -32,7 +32,7 @@ Meteor.methods({
 				summary_polyline: c.summary_polyline,
 				comments: c.comments,
 				createdAt: c.createdAt,
-				profilePic: oneUser.profilePic
+				profilePic: oneUser.profilePic				
 		 	};
 			
 			data.push(oneData);

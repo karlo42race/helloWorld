@@ -36,7 +36,7 @@ class TestPage extends Component {
 				userArray = ["LadPXDt6urSre2k3o", "s8tWQPTJGdEzWdf8a"]
 		
 		if(Roles.userIsInRole(Meteor.user(), ['admin']) ) {
-			Meteor.call('orders.getCurrencyConversion', skipCount, (err, res) => {
+			Meteor.call('users.getOwnUserData', skipCount, 'feeds', (err, res) => {
 				if(err) {
 					console.log(err.reason);
 					alert(err.reason)
@@ -45,7 +45,7 @@ class TestPage extends Component {
 					this.setState({data: res});
 				}
 			});
-			
+
 		} else {
 			alert('Test clicked');
 		};
