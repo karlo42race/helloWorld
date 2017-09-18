@@ -79,7 +79,12 @@ const selectCountry = [
 		"country": "Myanmar",
 		"addressName": "Myanmar (+S$5 delivery fee)",
 		"deliveryFee": 5
-	},	
+	},
+	{
+		"country": "New Zealand",
+		"addressName": "New Zealand (+S$10 delivery fee)",
+		"deliveryFee": 10
+	},
 	{
 		"country": "Philippines",
 		"addressName": "Philippines (+S$5 delivery fee)",
