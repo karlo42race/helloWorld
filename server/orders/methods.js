@@ -21,6 +21,7 @@ import {
 Meteor.methods({	 // payment using stripe 
 	'orders.create'(raceData, currentUser, values, token) {		
 		let { race_name } = raceData;
+		console.log('values from orders.create is', values);
 		let { email, priceInCents, currency, addonArray } = values;
 		let { profile } = currentUser;
 		let userId = this.userId;
