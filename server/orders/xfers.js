@@ -1,7 +1,7 @@
 import { check } from 'meteor/check';
 import { WebApp } from 'meteor/webapp';
 import { HTTP } from 'meteor/http';
-import { Orders, OrderNumber, ProductItems, AllResults, VirtualRaces } from '/imports/api/collections.js';
+import { AllResults, Countries, Orders, OrderNumber, ProductItems, VirtualRaces } from '/imports/api/collections.js';
 
 import { OrderEmailToAdmin, OrderEmailToUser } from '../emails/order-emails'
 import { 
@@ -100,7 +100,7 @@ Meteor.methods({
 		// let { address, address2, unit_number, country, postal } = values;
 		// let addressDetails = `${address} ${address2} ${unit_number} ${country} ${postal}`;
 		const orderNum = getOrderNumber();
-		let { priceInCents, email, phone, currency, addonArray } = values;
+		let { priceInCents, email, phone, currency, addonArray, country } = values;
 		let { race_name } = raceData;
 		let { first_name, last_name } = userData.profile;
 		let desc = `Order for ${race_name} - order Id: ${orderNum}`;
@@ -140,17 +140,17 @@ Meteor.methods({
 					if(addonArray.length > 0) {
 						// add on stuff
 						let addonText = '';
+						let oneCountry = Countries.findOne({country: country});
+						let { showCurrency } = oneCountry;
 						// [{'item', 'variable', 'price'}, {...}]
-						// convert addonArray to 'item - variable: price'				
+						// convert addonArray to 'item - variable: price'	
+
+						// for mobile, price of addon already converted to local currency
+						// !IMPORTANT ONLY FOR MOBILE			
+						// TODO refactor code - modulize - get price from database
 						_.each(addonArray, (c) => {
 							let { variable, item, price } = c;
-							let priceToShow = price;
-
-							let showCurrency = '$';
-							if(currency == 'myr') {
-								showCurrency = 'RM';
-								priceToShow = price * toMyr;
-							}
+							let priceToShow = price;				
 												
 							let variableText = '';
 							if (variable) 
@@ -158,10 +158,8 @@ Meteor.methods({
 							let text = `${item} ${variableText}: ${showCurrency}${priceToShow.toFixed(2)}\n`;
 							addonText = addonText + text;
 
-							// minus avaiable stock for productitem, increase sold stock
-							takeProductItemStock(c, race_name);							
-
-						})				
+							takeProductItemStock(c, race_name);
+						});				
 						
 						// add addonArray and addonText to values
 						values['addonArray'] = addonArray;
@@ -197,85 +195,3 @@ Meteor.methods({
 	},
 
 });
-
-// Listen to incoming HTTP requests (can only be used on the server).
-// confirm order payment - Url xfers will send confirmation to after user made payment
-WebApp.connectHandlers.use('/api/order/confirm', (req, res, next) => {	
-	console.log('xfers req: ', req.body);
-	if (req.body)	{
-		let obj = req.body;
-		let { txn_id, order_id, status } = obj;
-		
-		console.log(`Xfers: status for ${order_id}: ${status}`);
-		// change order status to cancelled if payment is cancelled or expired
-		if( (status == 'cancelled') || (status == 'expired') ) {
-			let cancelledOrder = Orders.findOne({orderNum: parseInt(order_id)});
-			if(cancelledOrder) {
-				// set status to cancelled;
-				Orders.update({
-					_id: cancelledOrder._id
-				}, {
-					$set: {
-						status: 'cancelled'
-					}
-				});
-
-				// add stock back
-				returnStockByOrderNum(order_id);
-	
-			}
-		}
-		if(status == 'paid') {
-			// verify notification, send POST to xfers			
-			try {
-				let url = `${xfersUrl}/charges/${txn_id}/validate`;
-
-				console.log('checking url: ', url);
-				const result = HTTP.call("POST", url, {
-					headers: { 
-						"X-XFERS-USER-API-KEY": xfersUserApi,
-						ContentType: "application/json"
-					},
-					params: obj
-				});
-				if(result) {										
-					// change order to paid
-					// set status to paid;
-					let paidOrder = Orders.findOne({orderNum: parseInt(order_id)});
-					Orders.update({
-						_id: paidOrder._id
-					}, {
-						$set: {
-							status: 'paid'
-						}
-					});
-					// create result
-					createResultWithOrder(paidOrder);
-
-					// send email to admin and user
-					sendEmailWithOrderId(order_id);
-				};		
-
-				console.log('Xfers: payment successful');
-	    } catch(e) {
-	    	console.log('Error in xfers status paid: ', e);	    	
-	    }
-		}
-  }
-	
-	// return status 200 
-	res.setHeader('Content-Type', 'application/json');
-  res.writeHead(200);
-  res.end();
-
-});
-
-// curl "http://localhost:3000/api/order/confirm" \
-//   -H "Content-Type: application/json" \
-//   -d '{ "txn_id": "9557a25ad90848e7b02ee5ccfbf1bc8c", "order_id": "21256", "total_amount": "99000", "currency":"IDR", "status":"paid"}'
-
-// curl -X POST http://localhost:3000/api/order/confirm -d "title=Witty Title" -d "author=Jack Rose"
-
-// curl "http://localhost:3000/api/order/confirm" \
-//   -H "Content-Type: application/json" \
-//   -d '{ "txn_id": "310fd5d40a9846aca80f7469dc6db466", "order_id": "21255", "total_amount": "99000", "currency":"IDR", "status":"cancelled"}'

@@ -1,5 +1,5 @@
 import { check } from 'meteor/check';
-import { Orders, OrderNumber, ProductItems, AllResults, VirtualRaces } from '/imports/api/collections.js';
+import { AllResults, Countries, Orders, OrderNumber, ProductItems, VirtualRaces } from '/imports/api/collections.js';
 import { OrderEmailToAdmin, OrderEmailToUser, OrderFreeEmailToAdmin, OrderFreeEmailToUser, OrderEmailToBuddy, OrderEmailToUserWithBuddy } from '../emails/order-emails'
 import { 
 	createChargeOnStripe,
@@ -15,14 +15,12 @@ import {
 	takeStock,
 	sendEmailToAdmin,
 	sendEmailToUser,
-	createPAOrder,
-	toMyr } from './modules/order-helpers';
+	createPAOrder } from './modules/order-helpers';
 
 Meteor.methods({	 // payment using stripe 
 	'orders.create'(raceData, currentUser, values, token) {		
-		let { race_name } = raceData;
-		console.log('values from orders.create is', values);
-		let { email, priceInCents, currency, addonArray } = values;
+		let { race_name } = raceData;		
+		let { email, priceInCents, currency, addonArray, country } = values;
 		let { profile } = currentUser;
 		let userId = this.userId;
 		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);			
@@ -59,24 +57,15 @@ Meteor.methods({	 // payment using stripe
 				let addonText = '';
 
 				// [{'item', 'variable', 'price'}, {...}]
-				// convert addonArray to 'item - variable: price'				
+				// convert addonArray to 'item - variable: price'		
+				let countryOption = Countries.findOne({country: country});
+				let { showCurrency } = countryOption;	
+
 				// for mobile, price of addon already converted to local currency
 				// !IMPORTANT ONLY FOR MOBILE
 				_.each(addonArray, (c) => {
 					let { variable, item, price } = c;
-					let priceToShow = price;
-
-					let showCurrency = 'S$';
-					switch (currency) {
-						case 'myr': 
-							showCurrency = 'RM';
-							break;
-						case 'idr': 
-							showCurrency = 'Rp';
-							break;
-						default: 
-							break;
-					};					
+					let priceToShow = price;				
 										
 					let variableText = '';
 					if (variable) 
@@ -85,8 +74,7 @@ Meteor.methods({	 // payment using stripe
 					addonText = addonText + text;
 
 					takeProductItemStock(c, race_name);
-
-				})				
+				});
 				
 				// add addonArray and addonText to values
 				values['addonArray'] = addonArray;

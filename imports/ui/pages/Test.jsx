@@ -36,7 +36,7 @@ class TestPage extends Component {
 				userArray = ["LadPXDt6urSre2k3o", "s8tWQPTJGdEzWdf8a"]
 		
 		if(Roles.userIsInRole(Meteor.user(), ['admin']) ) {
-			Meteor.call('users.getOwnUserData', skipCount, 'feeds', (err, res) => {
+			Meteor.call('orders.getCountriesOptions', skipCount, 'feeds', (err, res) => {
 				if(err) {
 					console.log(err.reason);
 					alert(err.reason)

@@ -32,3 +32,4 @@ export const Payments = new Mongo.Collection('payments');
 export const Blogs = new Mongo.Collection('blogs');
 
 export const Teams = new Mongo.Collection('teams');
+export const Countries = new Mongo.Collection('countries');
