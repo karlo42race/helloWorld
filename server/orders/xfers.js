@@ -10,10 +10,12 @@ import {
 	createOrder,
 	checkResult,	
 	formatDate,
+	getAddonText,
 	getOrderNumber,
 	createResult,
 	returnProductItemStock,
 	takeProductItemStock,
+	takeProductItemStockByArray,
 	takeStock,
 	returnStockByOrderNum,
 	sendEmailToAdmin,
@@ -135,31 +137,12 @@ Meteor.methods({
 			if(result) {
 				if(result.statusCode == 200) {
 					console.log('charge went through, create order');
-
+					
 					// check if there is addon
-					if(addonArray.length > 0) {
-						// add on stuff
-						let addonText = '';
-						let oneCountry = Countries.findOne({country: country});
-						let { showCurrency } = oneCountry;
-						// [{'item', 'variable', 'price'}, {...}]
-						// convert addonArray to 'item - variable: price'	
-
-						// for mobile, price of addon already converted to local currency
-						// !IMPORTANT ONLY FOR MOBILE			
-						// TODO refactor code - modulize - get price from database
-						_.each(addonArray, (c) => {
-							let { variable, item, price } = c;
-							let priceToShow = price;				
-												
-							let variableText = '';
-							if (variable) 
-								variableText = ` - ${variable}`;
-							let text = `${item} ${variableText}: ${showCurrency}${priceToShow.toFixed(2)}\n`;
-							addonText = addonText + text;
-
-							takeProductItemStock(c, race_name);
-						});				
+					if(addonArray && addonArray.length > 0) {
+						// add on stuff							
+						takeProductItemStockByArray(addonArray, race_name);				
+						let addonText = getAddonText(addonArray, country, race_name);
 						
 						// add addonArray and addonText to values
 						values['addonArray'] = addonArray;

@@ -9,9 +9,11 @@ import {
 	checkResult,
 	createOrder,
 	formatDate,
-	getOrderNumber,
+	getAddonText,
+	getOrderNumber,	
 	createResult,
 	takeProductItemStock,
+	takeProductItemStockByArray,
 	takeStock,
 	sendEmailToAdmin,
 	sendEmailToUser,
@@ -19,12 +21,12 @@ import {
 
 Meteor.methods({	 // payment using stripe 
 	'orders.create'(raceData, currentUser, values, token) {		
-		let { race_name } = raceData;		
+		let { race_name } = raceData;
 		let { email, priceInCents, currency, addonArray, country } = values;
 		let { profile } = currentUser;
 		let userId = this.userId;
-		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);			
-
+		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);
+				
 		// check email exists
 		if(!email || (email == ''))
 			throw new Meteor.Error('no-email', 'Error: no email, add email on your dashboard');
@@ -53,33 +55,14 @@ Meteor.methods({	 // payment using stripe
 			let checkout_url = null;
 			// check if there is addon
 			if(addonArray && addonArray.length > 0) {
-				// add on stuff
-				let addonText = '';
-
-				// [{'item', 'variable', 'price'}, {...}]
-				// convert addonArray to 'item - variable: price'		
-				let countryOption = Countries.findOne({country: country});
-				let { showCurrency } = countryOption;	
-
-				// for mobile, price of addon already converted to local currency
-				// !IMPORTANT ONLY FOR MOBILE
-				_.each(addonArray, (c) => {
-					let { variable, item, price } = c;
-					let priceToShow = price;				
-										
-					let variableText = '';
-					if (variable) 
-						variableText = ` - ${variable}`;
-					let text = `${item} ${variableText}: ${showCurrency}${priceToShow.toFixed(2)}\n`;
-					addonText = addonText + text;
-
-					takeProductItemStock(c, race_name);
-				});
+				// add on stuff							
+				takeProductItemStockByArray(addonArray, race_name);				
+				let addonText = getAddonText(addonArray, country, race_name);
 				
 				// add addonArray and addonText to values
 				values['addonArray'] = addonArray;
 				values['addOn'] = addonText;
-			} 
+			}; 
 			
 			values['userID'] = userId;
 			// create order

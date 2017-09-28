@@ -1,13 +1,5 @@
 import { check } from 'meteor/check';
-import { Orders, OrderNumber, ProductItems, AllResults, Teams, VirtualRaces } from '/imports/api/collections.js';
-import {
-	toMyr,
-	toId,
-	racePriceSg,
-	racePriceMy,
-	racePriceId,
-	selectCountry
-} from '/imports/api/options';
+import { AllResults, Countries, Orders, OrderNumber, ProductItems, Teams, VirtualRaces } from '/imports/api/collections.js';
 
 // stripe
 const Stripe = require("stripe")("sk_live_TEPWTflfLxs5O8RzQXjqhnRx");
@@ -58,8 +50,10 @@ const checkPrice = ( values, race_name ) => {
 	let { country, addonArray, price, priceInCents } = values;
 	let subTotal = 0;
 	let total;
+	
 	// check priceInCents and price tally
-	if(price*100 !== priceInCents) {
+	if(parseInt(Math.round(price*100)) !== priceInCents) {
+		console.log(`${price*100}, ${typeof(price*100)}, ${priceInCents}, ${typeof(priceInCents)}`)
 		console.warn(`Error: price: ${price} !== priceInCents: ${priceInCents}`);
 		throw new Meteor.Error('price-unequal', 'Error: Price in cents not correct');
 	};
@@ -69,30 +63,22 @@ const checkPrice = ( values, race_name ) => {
 		let oneProduct = ProductItems.findOne({ race: race_name, item_name: item });		
 		subTotal += oneProduct.price; // in SGD
 	});
+	
+	let getCountriesOptions = Countries.find({}).fetch();
+	let oneCountry = getCountriesOptions.find(x => x.country === country);
+	let { convertFromOneSGD, currency, deliveryFee, racePriceInCurrency } = oneCountry;
 
 	// add country delivery cost
-	let countryDeliveryCost = getDeliveryCost(country);
-	subTotal += countryDeliveryCost 
+	total = subTotal*convertFromOneSGD + racePriceInCurrency + deliveryFee;
 
-	switch (country) {
-		case 'Malaysia':
-			total = subTotal*toMyr + racePriceMy;
-			break;
-		case 'Indonesia':
-			total = subTotal*toId + racePriceId;
-			break;
-		default:
-			total = subTotal + racePriceSg;
-			break;
-	};
+	// fix to 2 decimal	
+	let priceFix = parseInt(price*100)/100;
+	let totalFix = parseInt(total*100)/100;
 
-	// fix to 2 decimal
-	totalFix = parseInt(total*100)/100;
-
-	if(price !== totalFix) {
+	if(priceFix !== totalFix) {
 		console.warn(`Error: price ${price} !== total ${totalFix}, typeOf price: ${typeof(price)}, typeOf total: ${typeof(totalFix)}`);
 		throw new Meteor.Error('price-error', 'Error: Total price is incorrect');
-	}
+	};
 
 };
 
@@ -143,12 +129,32 @@ const createOrder = (raceData, values, currentUser, orderNum, checkout_url) => {
 		checkout_url
 	});				
 	console.log('Orders: Inserting order for', race_name, 'by', name, 'complete');	
-}
+};
 
 // format date to Do MMM YYY, h:mm a
 const formatDate = (date) => {
 	return moment(date).format('Do MMM YYYY, h:mm a');
-}
+};
+
+// get addonText
+const getAddonText = (addonArray, country, race_name) => {
+	let addOnText = '';
+	let countryOption = Countries.findOne({country: country});
+	let { racePriceInCurrency, showCurrency } = countryOption;	
+
+	_.each(addonArray, (c) => {
+		let { variable, item, price } = c;
+		let priceToShow = price * racePriceInCurrency;
+							
+		let variableText = '';
+		if (variable) 
+			variableText = ` - ${variable}`;
+		let text = `${item} ${variableText}: ${showCurrency}${priceToShow.toFixed(2)}\n`;
+		addonText = addonText + text;		
+	});
+
+	return addOnText;
+};
 
 // order number 
 const getOrderNumber = () => {
@@ -413,7 +419,14 @@ const takeProductItemStock = (addon, race_name) => {
 		}
 	});
 	console.log(`Stock take: ${item} - ${variable}`);
-}
+};
+
+// minus addon array stock if order succeed
+const takeProductItemStockByArray = (addonArray, race_name) => {
+	_.each(addonArray, (c) => {
+		takeProductItemStock(c, race_name);
+	})	
+};
 
 // when order is cancelled, add stock available and reduce stock sold
 const returnProductItemStock = (addon, race_name) => {
@@ -441,6 +454,7 @@ export {
 	checkResult,
 	createOrder,
 	formatDate,
+	getAddonText,
 	getOrderNumber,
 	createResult,
 	returnProductItemStock,
@@ -450,9 +464,4 @@ export {
 	sendEmailToAdmin,
 	sendEmailToUser,
 	createPAOrder,
-	toMyr,
-	toId,
-	racePriceSg,
-	racePriceMy,
-	racePriceId
 };

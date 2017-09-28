@@ -79,16 +79,18 @@ Meteor.methods({
 			let { race_type, distance, category, raceID, _id } = c;
 			if(race_type == 'virtual_race') {
 				if(distance >= category) {
-					let oneRace = VirtualRaces.findOne({_id: raceID});
+					// deprecate after badges change
+					let oneRace = VirtualRaces.findOne({_id: raceID});					
 					let badge = oneRace ? oneRace.badge_color : "";
 					badges.push(badge);
-				}
+				};
 			} else if (race_type == 'challenge') {
 				if(distance >= 20) {
+					// deprecate after badges change
 					let oneRace = VirtualRaces.findOne({_id: raceID});
-					let badge = oneRace ? oneRace.badge_color : "";
+					let badge = oneRace ? oneRace.badge_color : "";					
 					badges.push(badge);
-				}
+				};
 			};						
 		});	
 
@@ -98,10 +100,25 @@ Meteor.methods({
     	total_distance,
 			total_timing,
 			submissions_count,
-			badges
+			badges			
     });
 
     return data;
+
+	},
+
+	// return race details by badge_color url;
+	'users.showCompleteBadge'(badge_color) {
+		let oneRace = VirtualRaces.findOne({badge_color: badge_color});
+		let { badge_grey, race_name, race_name_lang, race_type } = oneRace;
+		let data = {
+			badge_color,
+			badge_grey,
+			race_name,
+			race_type,
+			race_name_lang
+		}; 
+		return data;		
 
 	},
 
