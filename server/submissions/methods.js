@@ -272,6 +272,11 @@ Meteor.methods({
 	'submissions.addLike'(submissionID) {
 		console.log('Submissions: adding like for ', submissionID, 'by', this.userId);
 		let submission = Submissions.findOne({_id: submissionID});
+		if(!submission) {
+			throw new Meteor.Error('no-submission', 'No such submission');
+			console.warn(`Submissions.add:Like: No such submission, id: ${submissionID}`);
+		};
+		
 		let { cheers } = submission;
 		let cheeredIndex = cheers.indexOf(this.userId);
 
@@ -285,7 +290,7 @@ Meteor.methods({
 	      	} 
 	      },
 			)
-			let likesArray = submission.cheers;
+			let likesArray = submission.cheers,
 					likesCount = parseInt(likesArray.length) + 1;				
 
 			Submissions.update(

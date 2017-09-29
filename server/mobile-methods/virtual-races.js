@@ -5,8 +5,7 @@ Meteor.methods({
 	'virtualRaces.getOneRace'(slug) {
 		check(slug, String);
 
-		let oneRace = VirtualRaces.findOne({slug: slug}, { fields: {'team': 0} });
-		console.log(oneRace);
+		let oneRace = VirtualRaces.findOne({slug: slug}, { fields: {'team': 0} });		
 		let race, raceID;
 		if(oneRace) {
 			race = oneRace.race_name;
