@@ -78,9 +78,9 @@ Meteor.methods({
 		let data = {
 			currentMonth: moment(today).format('M'),
 			currentYear: moment(today).format('Y'),
-			raceComingSoonPic: "https://joomlaforce.com/wp-content/uploads/2017/02/coming-soon-page-builder.png",
-			raceOngoingPic: "http://3.bp.blogspot.com/-No6eURCs50k/TWDvbIHLHVI/AAAAAAAAAR8/0QVffJ2jqI8/s1600/checkered+flag+hand.jpg",
-			raceEndedPic: "https://t4.ftcdn.net/jpg/00/36/53/91/500_F_36539132_d030gU4ywLB6LqeYd75ZOiX0RGaJAcke.jpg",
+			raceComingSoonPic: "https://virtual-race-submissions.s3-ap-southeast-1.amazonaws.com/images/hourglass-200x200-png-93j29092017-155157",
+			raceOngoingPic: "https://virtual-race-submissions.s3-ap-southeast-1.amazonaws.com/images/runningman-200x200-png-vht29092017-155157",
+			raceEndedPic: "https://virtual-race-submissions.s3-ap-southeast-1.amazonaws.com/images/hotair-balloon-200x200-png-wdw29092017-155157",
 			races
 		}
 
