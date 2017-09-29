@@ -269,15 +269,17 @@ Meteor.methods({
 	},	
 
 	// Add like to submission
-	'submissions.addLike'(submissionID) {
-		console.log('Submissions: adding like for ', submissionID, 'by', this.userId);
+	'submissions.addLike'(value) {
+		let submissionID = value.trim();
+		check(submissionID, String);
+		console.log(`Submissions: adding like for "${submissionID}"" by ${this.userId}`);
 		let submission = Submissions.findOne({_id: submissionID});
 		if(!submission) {
 			throw new Meteor.Error('no-submission', 'No such submission');
-			console.warn(`Submissions.add:Like: No such submission, id: ${submissionID}`);
+			console.warn(`Submissions.add:Like: No such submission, id: "${submissionID}"`);
 		};
-		
-		let { cheers } = submission;
+
+		let cheers = submission.cheers ? submission.cheers : [];
 		let cheeredIndex = cheers.indexOf(this.userId);
 
 		if(cheeredIndex > -1) {
