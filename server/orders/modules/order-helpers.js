@@ -138,7 +138,7 @@ const formatDate = (date) => {
 
 // get addonText
 const getAddonText = (addonArray, country, race_name) => {
-	let addOnText = '';
+	let addonText = '';
 	let countryOption = Countries.findOne({country: country});
 	let { racePriceInCurrency, showCurrency } = countryOption;	
 
@@ -153,7 +153,7 @@ const getAddonText = (addonArray, country, race_name) => {
 		addonText = addonText + text;		
 	});
 
-	return addOnText;
+	return addonText;
 };
 
 // order number 

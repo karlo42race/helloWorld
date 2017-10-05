@@ -56,7 +56,7 @@ Meteor.methods({	 // payment using stripe
 			// check if there is addon
 			if(addonArray && addonArray.length > 0) {
 				// add on stuff							
-				takeProductItemStockByArray(addonArray, race_name);				
+				takeProductItemStockByArray(addonArray, race_name);
 				let addonText = getAddonText(addonArray, country, race_name);
 				
 				// add addonArray and addonText to values
