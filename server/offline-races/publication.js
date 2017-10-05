@@ -3,14 +3,13 @@ import { Races } from '/imports/api/collections.js';
 
 // for User Race List
 Meteor.publish('getOfflineRaces', function(searchText, limit, skipCount, showAll, country) {
-  var positiveIntegerCheck = Match.Where(function(x) {
+  let positiveIntegerCheck = Match.Where(function(x) {
     check(x, Match.Integer);
     return x >= 0;
   });
   check(skipCount, positiveIntegerCheck);
-  
-  console.log('getOfflineRaces params', searchText, limit, skipCount, showAll, country);
-  var options = {
+
+  let options = {
     limit: limit,
     skip: skipCount,
     sort: [['race_date', 'ascending']],
