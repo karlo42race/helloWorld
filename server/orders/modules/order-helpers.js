@@ -459,6 +459,7 @@ export {
 	createResult,
 	returnProductItemStock,
 	takeProductItemStock,
+	takeProductItemStockByArray,
 	takeStock,
 	returnStockByOrderNum,
 	sendEmailToAdmin,

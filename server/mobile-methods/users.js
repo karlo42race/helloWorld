@@ -185,6 +185,15 @@ Meteor.methods({
 	    data.push(oneData);
 		});
 		
+		// set notification flag to false
+		Meteor.users.update({
+			_id: this.userId
+		}, {
+			$set: {
+				message: false				
+			}
+		})
+		
 		return data;
 	},
 	
