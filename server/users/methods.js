@@ -23,6 +23,9 @@ Meteor.methods({
 	// update user profile
 	'users.updateDetails'(value) {
 		let { motto, name, first_name, last_name, phone, country_code, nric, gender, birthday } = value;
+
+		console.log('birthday: ', birthday, moment(birthday).format('DD/MM/YYYY'));
+		
 		Meteor.users.update({
 			_id: this.userId
 		}, {

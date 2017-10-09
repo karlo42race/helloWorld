@@ -4,6 +4,10 @@ import { Notifications, Submissions, Comments } from '/imports/api/collections.j
 Meteor.methods({
 	'notifications.insert'(postID, notifier_userID, post_type, action_type, message, toUserID) {	
 		console.log('Notifications: adding notifications by', notifier_userID, '..');	
+		
+		// for testing
+		console.log('check: ', postID, notifier_userID, post_type, action_type, message, toUserID);
+
 		let notifier_publicID, notifier_user_name, user_publicID;		
 		
 		var userB = Meteor.users.findOne({_id: notifier_userID}); // userB

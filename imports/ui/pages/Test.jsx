@@ -30,7 +30,7 @@ class TestPage extends Component {
 	getData() {
 		let page = currentPage.get();
 		
-		let method = "users.getOwnUserData",
+		let method = "users.getProfileData",
 				field1 = "27foC6M7TXLGLMj9m",
 				field2 = 10,
 				field3 = "https://virtual-race-submissions.s3-ap-southeast-1.amazonaws.com/images/6-Badges-1000-1000-001-jpeg-ky011082017-151256",

@@ -219,5 +219,25 @@ Meteor.methods({
 		return data;
 
 	},
+
+	'users.getProfileData'() {
+		let currentUser = Meteor.users.findOne({_id: this.userId});
+
+		if(!currentUser) 
+			throw new Meteor.Error('no-user-found', 'No user found');
+
+		let { profile, motto, publicID, phone, country_code, birthday } = currentUser;
+		let data = {
+			profile, 
+			motto,
+			publicID,
+			phone, 
+			country_code,
+			birthday: moment(birthday).format('DD/MM/YYYY')
+		}
+
+		return data;
+
+	},
 	
 });
