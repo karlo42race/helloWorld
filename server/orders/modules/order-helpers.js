@@ -140,22 +140,17 @@ const formatDate = (date) => {
 const getAddonText = (addonArray, country, race_name) => {
 	let addonText = '';
 	let countryOption = Countries.findOne({country: country});
-	let { racePriceInCurrency, showCurrency } = countryOption;	
-	
-	console.log(`country is ${country}`);
-	console.log(`countryOption is ${countryOption}`);
+	let { convertFromOneSGD, showCurrency } = countryOption;		
 
 	_.each(addonArray, (c) => {
 		let { variable, item, price } = c;
-		let priceToShow = price * racePriceInCurrency;
+		let priceToShow = price * convertFromOneSGD;
 							
 		let variableText = '';
 		if (variable) 
 			variableText = ` - ${variable}`;
 		let text = `${item} ${variableText}: ${showCurrency}${priceToShow.toFixed(2)}\n`;
-		addonText = addonText + text;		
-
-		console.log(`addonText in getAddontext ${addonText}`);
+		addonText = addonText + text;				
 	});
 
 	return addonText;
