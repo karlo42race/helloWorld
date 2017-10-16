@@ -1,5 +1,5 @@
 import { check } from 'meteor/check';
-import { AllResults, Countries, Orders, OrderNumber, ProductItems, VirtualRaces } from '/imports/api/collections.js';
+import { AllResults, Countries, Coupons, Orders, OrderNumber, ProductItems, VirtualRaces } from '/imports/api/collections.js';
 import { OrderEmailToAdmin, OrderEmailToUser, OrderFreeEmailToAdmin, OrderFreeEmailToUser, OrderEmailToBuddy, OrderEmailToUserWithBuddy } from '../emails/order-emails'
 import { 
 	createChargeOnStripe,
@@ -12,6 +12,7 @@ import {
 	getAddonText,
 	getOrderNumber,	
 	createResult,
+	takeCouponStock,
 	takeProductItemStock,
 	takeProductItemStockByArray,
 	takeStock,
@@ -53,6 +54,7 @@ Meteor.methods({	 // payment using stripe
 			// add status of payment to paid
 			values['status'] = 'paid';
 			let checkout_url = null;
+			let addonText = '';			
 			// check if there is addon
 			if(addonArray && addonArray.length > 0) {
 				// add on stuff							
@@ -63,6 +65,21 @@ Meteor.methods({	 // payment using stripe
 				values['addonArray'] = addonArray;
 				values['addOn'] = addonText;
 			}; 
+			// end addon check
+
+			// for promoCode
+			let coupon_type;
+			if(values.promoCode !== '') {
+				let oneCoupon = Coupons.findOne({coupon_code: values.promoCode});
+				if(oneCoupon) {
+					coupon_type = oneCoupon.type;
+					takeCouponStock(oneCoupon._id);
+				} else {
+					throw new Meteor.Error('no-coupon', 'Error: no such coupon');
+				};
+			};
+			values.coupon_type = coupon_type;			
+			// end for promoCode
 			
 			values['userID'] = userId;
 			// create order
@@ -249,6 +266,100 @@ Meteor.methods({	 // payment using stripe
 		});
 		
   },
+
+
+  'orders.checkCoupon'(couponCode, country_name, race_name, subtotal, countryCurrency) {
+  	check(couponCode, String);
+  	check(country_name, String);
+  	check(race_name, String);
+
+  	let couponCodeFix = couponCode.toUpperCase().trim();
+  	let oneCoupon = Coupons.findOne({coupon_code: couponCodeFix});
+  	let text = '', err = '', data = [];
+  	
+  	if(oneCoupon) {  		
+  		let { amount, country, currency, start_date, expiry_date, race, type } = oneCoupon;
+
+  		let getCountriesOptions = Countries.find({}).fetch();
+			let oneCountry = getCountriesOptions.find(x => x.country === country_name);
+			let { showCurrency } = oneCountry;
+
+  		let today = new Date();
+			
+			// check if currency is correct 
+			if(countryCurrency !== currency) {
+				// cannot be used for this race
+  			text = ''; err = 'Coupon cannot be used for this country'; data = [];
+  			return { text, err, data };
+  		}
+
+  		// check if coupon can be used for this race;
+  		if(race && race.length > 1 && race.indexOf(race_name) == -1) {
+  			// cannot be used for this race
+  			text = ''; err = 'Coupon cannot be used for this race'; data = [];
+  			return { text, err, data };
+  		}; 
+			
+			// check if coupon can be used for this race;	
+  		if(country && country.length > 1 && country.indexOf(country_name) == -1) {
+  			// cannot be used for this country
+  			text = ''; err = 'Coupon cannot be used for this country'; data = [];
+  			return { text, err, data };  			
+  		};
+
+			// check if coupon expired
+  		if(expiry_date && today.getTime() > expiry_date.getTime()) {
+				text = ''; err = 'Coupon expired'; data = [];
+				return { text, err, data };
+  		};
+
+  		// check if coupon started
+  		if(start_date && today.getTime() < start_date.getTime()) {
+				text = ''; err = 'Coupon not availale'; data = [];
+				return { text, err, data };
+  		};
+
+  		// check if still have coupon left;
+  		if(oneCoupon.qty_left < 1) {
+  			text = ''; err = 'No stock left'; data = [];
+  			return { text, err, data };
+  		};
+			
+			// coupon available
+			let typeShow = '';
+			let newTotal = subtotal;
+			let discount = amount;
+			if(type && type == 'fix_cart') {				
+				text = `${showCurrency} ${amount} OFF`;				
+				newTotal = subtotal - amount;
+			};
+
+			if(type && type == 'percentage') {
+  			text = `${amount}% OFF`;
+  			discount = parseInt((subtotal*amount/100)*100)/100;
+  			newTotal = subtotal*((100-amount)/100);
+  			// fix to 2 decimal	
+				newTotal = parseInt(newTotal*100)/100;
+			};
+			
+			// check if price is -ve
+			if(newTotal < 0)
+				throw new Meteor.Error('price-negative', 'Error: problem with coupon');
+
+  		data = oneCoupon;
+  		data.newTotal = newTotal;
+  		data.discount = discount;
+  		return { text, err, data };
+  			
+  	} else {
+  		// no coupon found
+  		text = ''; err = 'No coupon found'; data = [];
+  		return { text, err, data };
+  	};  	
+  	
+  },
+
+
 
 
 })

@@ -1,14 +1,15 @@
 import { check } from 'meteor/check';
 import { WebApp } from 'meteor/webapp';
 import { HTTP } from 'meteor/http';
-import { AllResults, Countries, Orders, OrderNumber, ProductItems, VirtualRaces } from '/imports/api/collections.js';
+import { AllResults, Countries, Coupons, Orders, OrderNumber, ProductItems, VirtualRaces } from '/imports/api/collections.js';
 
 import { OrderEmailToAdmin, OrderEmailToUser } from '../emails/order-emails'
 import { 
 	createChargeOnStripe,
 	checkOrder,
 	createOrder,
-	checkResult,	
+	checkPrice,
+	checkResult,
 	formatDate,
 	getAddonText,
 	getOrderNumber,
@@ -107,6 +108,8 @@ Meteor.methods({
 		let { first_name, last_name } = userData.profile;
 		let desc = `Order for ${race_name} - order Id: ${orderNum}`;
 		const IndoPrice = priceInCents / 100;		
+
+		checkPrice(values, race_name); // check if price is correct
 		
 		// check email exists
 		if(!email || (email == ''))

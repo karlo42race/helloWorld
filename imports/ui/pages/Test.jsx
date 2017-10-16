@@ -30,14 +30,17 @@ class TestPage extends Component {
 	getData() {
 		let page = currentPage.get();
 		
-		let method = "app.getVersion",
-				field1 = "27foC6M7TXLGLMj9m",
-				field2 = 10,
-				field3 = "https://virtual-race-submissions.s3-ap-southeast-1.amazonaws.com/images/6-Badges-1000-1000-001-jpeg-ky011082017-151256",
+		let method = "orders.checkCoupon",
+				field1 = "5OFF",
+				field2 = 'Singapore',
+				field3 = "Wonder Pets Virtual Run",
+				field4 = 9.90,
+				field5 = 'sgd',
 				userArray = ["LadPXDt6urSre2k3o", "s8tWQPTJGdEzWdf8a"]
 		
 		if(Roles.userIsInRole(Meteor.user(), ['superadmin', 'admin']) ) {
-			Meteor.call(method, field1, field2, (err, res) => {
+
+			Meteor.call(method, field1, field2, field3, field4, field5, (err, res) => {
 				if(err) {
 					console.log(err.reason);
 					alert(err.reason)

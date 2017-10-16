@@ -33,3 +33,4 @@ export const Blogs = new Mongo.Collection('blogs');
 
 export const Teams = new Mongo.Collection('teams');
 export const Countries = new Mongo.Collection('countries');
+export const Coupons = new Mongo.Collection('coupons');

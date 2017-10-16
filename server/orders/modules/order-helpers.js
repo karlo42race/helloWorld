@@ -1,5 +1,5 @@
 import { check } from 'meteor/check';
-import { AllResults, Countries, Orders, OrderNumber, ProductItems, Teams, VirtualRaces } from '/imports/api/collections.js';
+import { AllResults, Countries, Coupons, Orders, OrderNumber, ProductItems, Teams, VirtualRaces } from '/imports/api/collections.js';
 
 // stripe
 const Stripe = require("stripe")("sk_live_TEPWTflfLxs5O8RzQXjqhnRx");
@@ -50,6 +50,7 @@ const checkPrice = ( values, race_name ) => {
 	let { country, addonArray, price, priceInCents } = values;
 	let subTotal = 0;
 	let total;
+	let discount = 0;
 	
 	// check priceInCents and price tally
 	if(parseInt(Math.round(price*100)) !== priceInCents) {
@@ -67,9 +68,23 @@ const checkPrice = ( values, race_name ) => {
 	let getCountriesOptions = Countries.find({}).fetch();
 	let oneCountry = getCountriesOptions.find(x => x.country === country);
 	let { convertFromOneSGD, currency, deliveryFee, racePriceInCurrency } = oneCountry;
+	
+	if(promoCode) {
+		let oneCoupon = Coupons.findOne({coupon_code: promoCode});
+		if(oneCoupon) {
+			let { type, amount, currency } = oneCoupon;
+			// check currency is the same
+			if(currency !== values.currency)
+				throw new Meteor.Error('wrong-currency', 'Promo not available for your country');
+			if(type == 'percentage') 
+				discount = (subTotal*convertFromOneSGD + racePriceInCurrency)*((100-amount)/100);
+			if(type == 'fix_cart')
+				discount = amount;
+		};
+	};
 
 	// add country delivery cost
-	total = subTotal*convertFromOneSGD + racePriceInCurrency + deliveryFee;
+	total = subTotal*convertFromOneSGD + racePriceInCurrency + deliveryFee - discount;
 
 	// fix to 2 decimal	
 	let priceFix = parseInt(price*100)/100;
@@ -400,6 +415,22 @@ const createPAOrder = (raceData, values, currentUser, orderNum, checkout_url) =>
 	console.log('Orders: Inserting order for', race_name, 'by', name, 'complete');	
 }
 
+// take coupon stock
+const takeCouponStock = (id) => {
+	let oneCoupon = Coupons.findOne({_id: id});
+	if(!oneCoupon)
+		throw new Meteor.Error('no-coupon', 'Error: no such coupon');
+
+	Coupons.update({
+		_id: id
+	}, {
+		$inc: {
+			'qty_used': 1,
+			'qty_left': -1,
+		}
+	});
+};
+
 // minus category stock if order succeed
 const takeProductItemStock = (addon, race_name) => {
 	let { variable, item, price } = addon;
@@ -458,6 +489,7 @@ export {
 	getOrderNumber,
 	createResult,
 	returnProductItemStock,
+	takeCouponStock,
 	takeProductItemStock,
 	takeProductItemStockByArray,
 	takeStock,
