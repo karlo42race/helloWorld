@@ -294,14 +294,14 @@ Meteor.methods({	 // payment using stripe
   		}
 
   		// check if coupon can be used for this race;
-  		if(race && race.length > 1 && race.indexOf(race_name) == -1) {
+  		if(race && race.length > 0 && race.indexOf(race_name) == -1) {
   			// cannot be used for this race
   			text = ''; err = 'Coupon cannot be used for this race'; data = [];
   			return { text, err, data };
   		}; 
 			
 			// check if coupon can be used for this race;	
-  		if(country && country.length > 1 && country.indexOf(country_name) == -1) {
+  		if(country && country.length > 0 && country.indexOf(country_name) == -1) {
   			// cannot be used for this country
   			text = ''; err = 'Coupon cannot be used for this country'; data = [];
   			return { text, err, data };  			
