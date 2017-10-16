@@ -15,6 +15,7 @@ import {
 	getOrderNumber,
 	createResult,
 	returnProductItemStock,
+	takeCouponStock,
 	takeProductItemStock,
 	takeProductItemStockByArray,
 	takeStock,
@@ -153,9 +154,22 @@ Meteor.methods({
 					}; 
 
 					let checkout_url = result.data.checkout_url;
-
 					// take stock for VR category
 					takeStock(raceData, values);
+
+					// for promoCode
+					let coupon_type;
+					if(values.promoCode !== '') {
+						let oneCoupon = Coupons.findOne({coupon_code: values.promoCode});
+						if(oneCoupon) {
+							coupon_type = oneCoupon.type;
+							takeCouponStock(oneCoupon._id);
+						} else {
+							throw new Meteor.Error('no-coupon', 'Error: no such coupon');
+						};
+					};
+					values.coupon_type = coupon_type;
+					// end for promoCode
 					
 					// create order with pending status
 					createOrder(raceData, values, userData, orderNum, checkout_url);
