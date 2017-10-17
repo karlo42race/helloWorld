@@ -23,9 +23,12 @@ Meteor.methods({
 	// update user profile
 	'users.updateDetails'(value) {
 		let { motto, name, first_name, last_name, phone, country_code, nric, gender, birthday } = value;
-
-		console.log('birthday: ', birthday, moment(birthday).format('DD/MM/YYYY'));
 		
+		console.log(`Updating user profile for ${name}`);		
+		
+		if(!name || !first_name || !last_name || !phone )
+			throw new Meteor.Error('field-missing', 'Error: Please update to latest app version');
+
 		Meteor.users.update({
 			_id: this.userId
 		}, {
@@ -37,7 +40,7 @@ Meteor.methods({
 					name,
 					first_name,
 					last_name,
-					nric,
+					nric: '',
 					gender,
 				},
 				motto,
@@ -111,6 +114,11 @@ Meteor.methods({
 		} = data;
 		let { profile } = currentUser;
 		let { name } = profile;
+
+		console.log(`Updating user profile for ${name}`);		
+		
+		if(!name || !first_name || !last_name || !phone )
+			throw new Meteor.Error('field-missing', 'Error: Please update to latest app version');
 
 		// update addressUpdate by and time;
 		addressUpdateBy(data, this.userId);

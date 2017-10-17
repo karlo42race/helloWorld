@@ -103,16 +103,20 @@ const createOrder = (raceData, values, currentUser, orderNum, checkout_url) => {
 	let { 
 		userID, email, phone, country_code, address, address2, unit_number, country, postal,
 		price, currency, medal_engraving, addonArray, addOn, category, 
-		team, runner, addressBelongsTo, status
+		team, runner, addressBelongsTo, status,
+		promoCode, coupon_type, discount
 	} = values;
 	let { profile, publicID } = currentUser;	
 	let { name } = profile;
 
 	let priceFix = 0;
-		
+			
 	if(price > 0)
 		priceFix = parseFloat(Math.round(price * 100) / 100).toFixed(2);	
 	
+	let discountToAdd = discount || 0;
+	let grossPrice = price + discountToAdd;
+
 	Orders.insert({
 		orderNum,
 		product_name: race_name, 
@@ -141,7 +145,12 @@ const createOrder = (raceData, values, currentUser, orderNum, checkout_url) => {
 		addOn: addOn || '',
 		createdAt: new Date(),
 		status,
-		checkout_url
+		checkout_url,
+		gross_price: grossPrice || price,
+		discount: discount || 0,
+		coupon_code: promoCode || '',
+		coupon_type: coupon_type || '',
+		orderIn: 'mobile'
 	});				
 	console.log('Orders: Inserting order for', race_name, 'by', name, 'complete');	
 };
