@@ -27,7 +27,7 @@ Meteor.methods({
 		console.log(`Updating user profile for ${name}`);		
 		
 		if(!name || !first_name || !last_name || !phone )
-			throw new Meteor.Error('field-missing', 'Error: Please update to latest app version');
+			throw new Meteor.Error('field-missing', 'Error: Please fill in all the fields');
 
 		Meteor.users.update({
 			_id: this.userId
@@ -117,8 +117,8 @@ Meteor.methods({
 
 		console.log(`Updating user profile for ${name}`);		
 		
-		if(!name || !first_name || !last_name || !phone )
-			throw new Meteor.Error('field-missing', 'Error: Please update to latest app version');
+		if(!name || !first_name || !last_name || !phone || !country )
+			throw new Meteor.Error('field-missing', 'Error: Please fill in all the fields');
 
 		// update addressUpdate by and time;
 		addressUpdateBy(data, this.userId);
