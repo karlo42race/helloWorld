@@ -71,7 +71,7 @@ Meteor.methods({	 // payment using stripe
 
 			// for promoCode
 			let coupon_type;
-			if(values.promoCode !== '') {
+			if(values.promoCode && values.promoCode !== '') {
 				let oneCoupon = Coupons.findOne({coupon_code: values.promoCode});
 				if(oneCoupon) {
 					coupon_type = oneCoupon.type;
