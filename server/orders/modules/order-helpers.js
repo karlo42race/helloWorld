@@ -97,6 +97,12 @@ const checkPrice = ( values, race_name ) => {
 
 };
 
+const checkProfile = (profile) => {
+	let { name, first_name, last_name, phone } = profile;
+	if(!name || !first_name || !last_name || !phone)
+		throw new Meteor.Error('no-profile', 'Error: User profile not filled');
+};
+
 // create order
 const createOrder = (raceData, values, currentUser, orderNum, checkout_url) => {
 	let { race_name, _id } = raceData;
@@ -491,6 +497,7 @@ export {
 	checkAddonCountry,
 	checkOrder,
 	checkPrice,
+	checkProfile,
 	checkResult,
 	createOrder,
 	formatDate,

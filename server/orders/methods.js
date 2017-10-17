@@ -6,6 +6,7 @@ import {
 	checkAddonCountry,
 	checkOrder,
 	checkPrice,
+	checkProfile,
 	checkResult,
 	createOrder,
 	formatDate,
@@ -27,7 +28,8 @@ Meteor.methods({	 // payment using stripe
 		let { profile } = currentUser;
 		let userId = this.userId;
 		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);
-				
+		
+		checkProfile(profile);
 		// check email exists
 		if(!email || (email == ''))
 			throw new Meteor.Error('no-email', 'Error: no email, add email on your dashboard');
