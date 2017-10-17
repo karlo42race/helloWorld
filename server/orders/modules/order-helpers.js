@@ -98,9 +98,11 @@ const checkPrice = ( values, race_name ) => {
 };
 
 const checkProfile = (profile) => {
-	let { name, first_name, last_name, phone } = profile;
-	if(!name || !first_name || !last_name || !phone)
+	let { name, first_name, last_name } = profile;
+	if(!name || !first_name || !last_name) {
+		console.log(`Profile is ${profile}`);
 		throw new Meteor.Error('no-profile', 'Error: User profile not filled');
+	}
 };
 
 // create order
