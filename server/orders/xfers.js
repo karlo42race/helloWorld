@@ -159,13 +159,13 @@ Meteor.methods({
 
 					// for promoCode
 					let coupon_type;
-					if(values.promoCode !== '') {
+					if(values.promoCode && values.promoCode !== '') {
 						let oneCoupon = Coupons.findOne({coupon_code: values.promoCode});
 						if(oneCoupon) {
 							coupon_type = oneCoupon.type;
 							takeCouponStock(oneCoupon._id);
 						} else {
-							throw new Meteor.Error('no-coupon', 'Error: no such coupon');
+							throw new Meteor.Error('no-coupon', 'Error: coupon not found');
 						};
 					};
 					values.coupon_type = coupon_type;

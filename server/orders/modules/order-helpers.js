@@ -158,7 +158,7 @@ const createOrder = (raceData, values, currentUser, orderNum, checkout_url) => {
 		discount: discount || 0,
 		coupon_code: promoCode || '',
 		coupon_type: coupon_type || '',
-		orderIn: 'mobile'
+		orderIn: 'mobile'  // different from web and mobile app
 	});				
 	console.log('Orders: Inserting order for', race_name, 'by', name, 'complete');	
 };
