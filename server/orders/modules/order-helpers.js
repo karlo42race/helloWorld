@@ -47,7 +47,7 @@ const checkOrder = ( userID, raceData ) => {
 
 // check if total price is correct
 const checkPrice = ( values, race_name ) => {	
-	let { country, addonArray, price, priceInCents } = values;
+	let { country, addonArray, price, priceInCents, promoCode } = values;
 	let subTotal = 0;
 	let total;
 	let discount = 0;
