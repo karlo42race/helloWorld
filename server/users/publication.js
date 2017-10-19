@@ -105,7 +105,7 @@ Accounts.onCreateUser(function(options, user) {
   let userNumID = userNum[0]._id;
   newPublicID = parseInt(publicID) + 1;
 	
-	// console.log('options', options, 'The user is:', user);
+	console.log(`options are ${options}, The user is: ${user}`);
 	
 	// create userMeta 
 	// check if meta data exists for user
@@ -161,7 +161,9 @@ Accounts.onCreateUser(function(options, user) {
 
   if (user.services) { // sign up via external service, e.g. facebook
     service = _.keys(user.services)[0] // get service type
-    email = user.services[service].email;        
+    email = user.services[service].email;     
+
+    console.log(`user services are: ${user.services}`);
 	  if (email) {	  	
 	  	oldUser = Meteor.users.findOne({"emails.address": email});	  	
 	  	if (oldUser) { // user with email exists	  		
@@ -183,6 +185,8 @@ Accounts.onCreateUser(function(options, user) {
 	  		user.profile = {};
 	  		if (user.services[service].name) {
 	  			user.profile.name = user.services[service].name; 	
+	  			console.log(`user services[service].name is: ${user.services[service].name}`);
+	  			console.log(`user services[service].fullname is: ${user.services[service].fullname}`);
 	  		};
 	  		if (user.services[service].first_name) {
 	  			user.profile.first_name = user.services[service].first_name;	
@@ -201,6 +205,7 @@ Accounts.onCreateUser(function(options, user) {
 	  	if (options.profile) {
     		user.profile = options.profile;
     		user.publicID = publicID;
+    		console.log(`options.profile is ${options.profile}`);
 	  	}
 	  	console.log('Users: account created');
 	  	return user;
