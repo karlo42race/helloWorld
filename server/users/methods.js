@@ -162,10 +162,13 @@ Meteor.methods({
 		} = data;
 		let { profile } = currentUser;
 		let { name } = profile;
-
-		if(!name || !first_name || !last_name || !phone )
+		
+		if(!name || !first_name || !last_name || !phone ) {
+			console.log(data, currentUser);
+			console.log(name, first_name, last_name, phone);
 			throw new Meteor.Error('field-missing', 'Error: Please fill in all the fields');
-		if(phone && phone.length<4)
+		}
+		if(phone && phone.length<6)
 			throw new Meteor.Error('phone-error', 'Error: Fill in correct phone number');
 		if(!country_code && country_code.length > 4)
 			throw new Meteor.Error('phone-error', 'Error: Fill in correct country code');
