@@ -28,6 +28,10 @@ Meteor.methods({
 		
 		if(!name || !first_name || !last_name || !phone )
 			throw new Meteor.Error('field-missing', 'Error: Please fill in all the fields');
+		if(phone && phone.length<4)
+			throw new Meteor.Error('phone-error', 'Error: Fill in correct phone number');
+		if(!country_code && country_code.length > 4)
+			throw new Meteor.Error('phone-error', 'Error: Fill in correct country code');
 
 		Meteor.users.update({
 			_id: this.userId
@@ -159,6 +163,13 @@ Meteor.methods({
 		let { profile } = currentUser;
 		let { name } = profile;
 
+		if(!name || !first_name || !last_name || !phone )
+			throw new Meteor.Error('field-missing', 'Error: Please fill in all the fields');
+		if(phone && phone.length<4)
+			throw new Meteor.Error('phone-error', 'Error: Fill in correct phone number');
+		if(!country_code && country_code.length > 4)
+			throw new Meteor.Error('phone-error', 'Error: Fill in correct country code');
+
 		Meteor.users.update({
 			_id: this.userId
 		}, {
@@ -170,7 +181,7 @@ Meteor.methods({
 					name,
 					first_name,
 					last_name,
-					nric,
+					nric: '',
 					gender
 				},				
 				updatedBy: name,
