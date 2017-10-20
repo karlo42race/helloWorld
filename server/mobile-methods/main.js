@@ -5,7 +5,7 @@ Meteor.methods({
 		// todo: get this data from database - kim to be allowed to updaate
 		let data = {
 			ios: {
-		    version: "1.0.6",
+		    version: "1.1.2",
 				forceUpdate: true
 			},
 			android: {

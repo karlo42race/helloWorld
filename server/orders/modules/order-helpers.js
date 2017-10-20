@@ -61,7 +61,7 @@ const checkPrice = ( values, race_name ) => {
 		
 	_.each(addonArray, (c) => {
 		let { item } = c;
-		let oneProduct = ProductItems.findOne({ race: race_name, item_name: item });		
+		let oneProduct = ProductItems.findOne({ race: race_name, item_name: item });
 		subTotal += oneProduct.price; // in SGD
 	});
 	
@@ -175,14 +175,17 @@ const getAddonText = (addonArray, country, race_name) => {
 	let { convertFromOneSGD, showCurrency } = countryOption;		
 
 	_.each(addonArray, (c) => {
-		let { variable, item, price } = c;
+		let { variable, item } = c;
+		let oneProduct = ProductItems.findOne({ race: race_name, item_name: item });
+		let { price } = oneProduct;
+		
 		let priceToShow = price * convertFromOneSGD;
 							
 		let variableText = '';
 		if (variable) 
 			variableText = ` - ${variable}`;
 		let text = `${item} ${variableText}: ${showCurrency}${priceToShow.toFixed(2)}\n`;
-		addonText = addonText + text;				
+		addonText = addonText + text;
 	});
 
 	return addonText;
