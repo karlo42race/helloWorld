@@ -203,9 +203,19 @@ Accounts.onCreateUser(function(options, user) {
 	  	}
 	  } else { // create new account, sign up via normal password user creation	  	
 	  	if (options.profile) {
+	  		let name = '';
+	  		if(options.profile.name) {
+	  			name = options.profile.name;
+	  		} else if (options.profile.fullname) {
+	  			name = options.profile.fullname;
+	  		} else if (options.profile.username) {
+	  			name = options.profile.username;
+	  		}
     		user.profile = options.profile;
+    		user.profile.name = name;
     		user.publicID = publicID;
     		console.log(`options.profile is ${options.profile}`);
+    		console.log(`user.profile is ${user.profile}`);
 	  	}
 	  	console.log('Users: account created');
 	  	return user;
