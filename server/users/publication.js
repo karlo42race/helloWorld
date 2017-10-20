@@ -135,7 +135,8 @@ Accounts.onCreateUser(function(options, user) {
 			} 
 		} 
 
-		let firstName = options.profile.name;
+		let firstName = options.profile.name || options.profile.fullname || options.profile.username;
+		console.log(`Accounts: firstName ${firstName}`);
 		// console.log('email', emailAddress, 'firstName', firstName);
 		// add to mailchimp
 		MailChimp.lists('subscribe', {
@@ -213,9 +214,7 @@ Accounts.onCreateUser(function(options, user) {
 	  		}
     		user.profile = options.profile;
     		user.profile.name = name;
-    		user.publicID = publicID;
-    		console.log(`options.profile is ${options.profile}`);
-    		console.log(`user.profile is ${user.profile}`);
+    		user.publicID = publicID;    		
 	  	}
 	  	console.log('Users: account created');
 	  	return user;
