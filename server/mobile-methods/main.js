@@ -6,7 +6,7 @@ Meteor.methods({
 		let data = {
 			ios: {
 		    version: "1.1.2",
-				forceUpdate: true
+				forceUpdate: false
 			},
 			android: {
 		    version: "1.0",
