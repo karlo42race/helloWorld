@@ -22,7 +22,7 @@ class TestPage extends Component {
 				console.log(err.reason);
 				alert(err.reason);
 			} else {
-				alert('You are now logged in');
+				alert('You are now logged in');				
 			}
 		})
 	}
@@ -30,7 +30,7 @@ class TestPage extends Component {
 	getData() {
 		let page = currentPage.get();
 		
-		let method = "orders.checkCoupon",
+		let method = "users.getProfileData",
 				field1 = "5OFF",
 				field2 = 'Singapore',
 				field3 = "Wonder Pets Virtual Run",
@@ -45,7 +45,7 @@ class TestPage extends Component {
 					console.log(err.reason);
 					alert(err.reason)
 				} else {
-					console.log(res);
+					console.log(`res ${res}`);
 					this.setState({data: res});
 				}
 			});

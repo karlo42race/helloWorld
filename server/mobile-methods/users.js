@@ -226,14 +226,17 @@ Meteor.methods({
 		if(!currentUser) 
 			throw new Meteor.Error('no-user-found', 'No user found');
 
-		let { profile, motto, publicID, phone, country_code, birthday } = currentUser;
+		let { profile, motto, publicID, phone, country_code, birthday } = currentUser;		
+		let birthdayShow = birthday;
+		if(birthday)
+			birthdayShow = moment(birthday).format('DD/MM/YYYY')
 		let data = {
 			profile, 
 			motto,
 			publicID,
 			phone, 
 			country_code,
-			birthday: moment(birthday).format('DD/MM/YYYY')
+			birthday: birthdayShow
 		}
 
 		return data;
