@@ -11,6 +11,8 @@ import {
 Meteor.methods({
 	// submit run
 	'submissions.insert'(values) {
+		console.log(`Logging: submissions.insert, values: ${values}`);
+
 		let { distance, hour, min, sec, url, journal, photo_url, timingInSec, timing_per_km, selectedResultIds, raceID, stravaData } = values;
 		let summary_polyline = null, map_id = null;
 		// check if strava run has aleady been submitted before
@@ -107,9 +109,11 @@ Meteor.methods({
 
 	// edit submission	
 	'submissions.edit'(data) {
+		console.log(`Logging: submissions.edit, values: ${values}`);
+
 		let { id, distance, hour, min, sec, timingInSec, timing_per_km, url, photo_url, journal } = data;	
 		let oldSubmission = Submissions.findOne({_id: id}),
-				oldDistance = oldSubmission.distance;
+				oldDistance = oldSubmission.distance,
 				oldTimingInSec = oldSubmission.timingInSec;		
 		
 		// check submission exists

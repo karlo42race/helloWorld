@@ -22,7 +22,9 @@ import {
 	createPAOrder } from './modules/order-helpers';
 
 Meteor.methods({	 // payment using stripe 
-	'orders.create'(raceData, currentUser, values, token) {		
+	'orders.create'(raceData, currentUser, values, token) {
+		console.log(`Logging: orders.createFree, raceData: ${raceData} \n currentUser: ${currentUser} \n values: ${values} \n token: ${token} `);
+				
 		let { race_name } = raceData;
 		let { email, priceInCents, currency, addonArray, country } = values;
 		let { profile } = currentUser;
@@ -106,7 +108,7 @@ Meteor.methods({	 // payment using stripe
 	},
 	
 	// create free orders
-	'orders.createFree'(raceData, currentUser, values) {
+	'orders.createFree'(raceData, currentUser, values) {		
 		let { race_name } = raceData;
 		let { email, priceInCents } = values;
 		let { profile } = currentUser;
@@ -274,6 +276,7 @@ Meteor.methods({	 // payment using stripe
   	check(couponCode, String);
   	check(country_name, String);
   	check(race_name, String);
+  	console.log(`Logging: orders.checkCoupon, couponCode: ${couponCode} \n country_name: ${country_name} \n race_name: ${race_name} \n subtotal: ${subtotal} \n countryCurrency: ${countryCurrency} \n `);
 
   	let couponCodeFix = couponCode.toUpperCase().trim();
   	let oneCoupon = Coupons.findOne({coupon_code: couponCodeFix});

@@ -95,6 +95,8 @@ const sendEmailWithOrderId = (orderId) => {
 Meteor.methods({
 	'xfers.charge'(raceData, values, userData) {		
     this.unblock();
+
+		console.log(`Logging: xfers.charge, raceData: ${raceData} \n values: ${values} \n userData: ${userData} `);
 		console.log('Xfers charge called');
 		
 		let userId = this.userId;

@@ -4,6 +4,8 @@ import { AllResults, Following, Notifications, UserMeta, VirtualRaces } from '/i
 Meteor.methods({
 	// for client mobile app login via facebook method
   'users.appLoginWithFacebook'(token) {
+  	console.log(`Logging: users.appLoginWithFacebook, token: ${token}`);
+  	
   	try {
       const result = HTTP.call('GET', 'https://graph.facebook.com/v2.3/me?fields=id,name,email,picture&access_token=' + token);
       email = result['data']['email'];
