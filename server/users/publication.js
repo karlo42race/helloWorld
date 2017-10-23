@@ -199,6 +199,7 @@ Accounts.onCreateUser(function(options, user) {
 	  			user.profile.gender = user.services[service].gender; 	
 	  		};
 	  		user.publicID = publicID;
+	  		user.motto = '';
 	  		console.log('Users: account created');
 	  		return user;
 	  	}
@@ -214,7 +215,8 @@ Accounts.onCreateUser(function(options, user) {
 	  		}
     		user.profile = options.profile;
     		user.profile.name = name;
-    		user.publicID = publicID;    		
+    		user.publicID = publicID;
+    		user.motto = '';
 	  	}
 	  	console.log('Users: account created');
 	  	return user;
