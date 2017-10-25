@@ -109,7 +109,7 @@ Meteor.methods({
 
 	// edit submission	
 	'submissions.edit'(data) {
-		console.log(`Logging: submissions.edit, values: ${values}`);
+		console.log(`Logging: submissions.edit, values: ${data}`);
 
 		let { id, distance, hour, min, sec, timingInSec, timing_per_km, url, photo_url, journal } = data;	
 		let oldSubmission = Submissions.findOne({_id: id}),
