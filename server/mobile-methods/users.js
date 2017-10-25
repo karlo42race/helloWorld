@@ -244,5 +244,35 @@ Meteor.methods({
 		return data;
 
 	},
+
+	'users.getFollowers'(user_publicID, limit, path) {
+		check(user_publicID, Number);
+		check(limit, Number);
+		check(path, String);
+		if(path !== 'following' && path !== 'followers')
+			throw new Meteor.Error('wrong-path', `Wrong path input: ${path}`);
+
+		let data, userIDs;
+		let options = {
+			limit: limit,
+			sort: {createdAt: -1},
+		};
+
+		if(path == 'following') {
+			data = Following.find({'user_publicID': user_publicID}, options); 
+			userIDs = data.map(function (c) {  	
+		    return c.idol_userID;
+		  });
+		} else if(path == 'followers') {
+			data = Following.find({'idol_publicID': user_publicID}, options); 
+			userIDs = data.map(function (c) {  	
+		    return c.userID;
+		  });
+		};
+		
+		data = Meteor.users.find({_id: {$in: userIDs}}, {fields: {'profile.name': 1, 'profilePic': 1, 'publicID': 1}}).fetch()  	
+	  
+	  return data;
+	},	
 	
 });

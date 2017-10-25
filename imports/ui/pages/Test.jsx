@@ -30,10 +30,10 @@ class TestPage extends Component {
 	getData() {
 		let page = currentPage.get();
 		
-		let method = "users.getProfileData",
-				field1 = "5OFF",
-				field2 = 'Singapore',
-				field3 = "Wonder Pets Virtual Run",
+		let method = "users.getFollowers",
+				field1 = 11000,
+				field2 = 10,
+				field3 = 'followers',
 				field4 = 9.90,
 				field5 = 'sgd',
 				userArray = ["LadPXDt6urSre2k3o", "s8tWQPTJGdEzWdf8a"]
