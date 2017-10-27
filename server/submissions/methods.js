@@ -11,7 +11,8 @@ import {
 Meteor.methods({
 	// submit run
 	'submissions.insert'(values) {
-		console.log(`Logging: submissions.insert, values: ${values}`);
+		console.log('Logging: submissions insert:');
+		console.log(values);
 
 		let { distance, hour, min, sec, url, journal, photo_url, timingInSec, timing_per_km, selectedResultIds, raceID, stravaData } = values;
 		let summary_polyline = null, map_id = null;
@@ -109,7 +110,8 @@ Meteor.methods({
 
 	// edit submission	
 	'submissions.edit'(data) {
-		console.log(`Logging: submissions.edit, values: ${data}`);
+		console.log('Logging: submissions edit:');
+		console.log(data);
 
 		let { id, distance, hour, min, sec, timingInSec, timing_per_km, url, photo_url, journal } = data;	
 		let oldSubmission = Submissions.findOne({_id: id}),
