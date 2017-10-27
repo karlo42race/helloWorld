@@ -23,7 +23,10 @@ import {
 
 Meteor.methods({	 // payment using stripe 
 	'orders.create'(raceData, currentUser, values, token) {
-		console.log(`Logging: orders.createFree, raceData: ${raceData} \n currentUser: ${currentUser} \n values: ${values} \n token: ${token} `);
+		
+		let loggingData = {raceData, currentUser, values, token};
+		console.log(`Logging: orders create`);
+		console.log(loggingData);
 				
 		let { race_name } = raceData;
 		let { email, priceInCents, currency, addonArray, country } = values;

@@ -89,7 +89,9 @@ Meteor.methods({
 
 	// update user address
 	'users.updateAddress'(value) {		
-		console.log(`Logging: users.updateAddress, value: ${value}`);
+		console.log(`Logging: users updateAddress`);
+		console.log(value);
+		
 		let { address, address2, unit_number, country, postal } = value;
 		if(!address || !country)
 			throw new Meteor.Error('missing-value', 'Please fill in address and country');
@@ -169,7 +171,12 @@ Meteor.methods({
 		let { profile } = currentUser;
 		let { name } = profile;
 		
-		console.log(`Logging: users.updateDetailsFromOrder, data: ${data}\n user: ${currentUser}`);
+		let loggingData = {
+			data: data,
+			currentUser: currentUser
+		};
+		console.log('Logging: users updateDetailsFromOrder:');
+		console.log(loggingData);		
 
 		if(!name || !first_name || !last_name || !phone ) {
 			console.log(data, currentUser);
