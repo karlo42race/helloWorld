@@ -97,7 +97,7 @@ Meteor.methods({
     this.unblock();
 		
 		let loggingData = {
-			raceData: raceDate,
+			raceData: raceData,
 			values: values,
 			userData: userData
 		};
