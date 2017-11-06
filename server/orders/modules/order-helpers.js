@@ -13,8 +13,10 @@ const addonArrayFix = (addonArray, race_name) => {
 		newAddon.index = parseInt(addonIndex) + 1;
 		newArray.push(newAddon);
 	});
-	console.log(`old array is ${addonArray}`);
-	console.log(`new array is ${newArray}`);
+	console.log('old array is:');
+	console.log(addonArray);
+	console.log('new array is:');
+	console.log(newArray);
 
 	return newArray;
 };

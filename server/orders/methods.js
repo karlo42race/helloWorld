@@ -77,8 +77,8 @@ Meteor.methods({	 // payment using stripe
 				values['addOn'] = addonText;				
 			}; 
 			// end addon check
-			console.log(`Orders creat, Values is ${values}`);
-
+			console.log(`Orders.create: Values is`);
+			console.log(values);
 
 			// for promoCode
 			let coupon_type;

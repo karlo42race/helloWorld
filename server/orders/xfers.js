@@ -5,6 +5,7 @@ import { AllResults, Countries, Coupons, Orders, OrderNumber, ProductItems, Virt
 
 import { OrderEmailToAdmin, OrderEmailToUser } from '../emails/order-emails'
 import { 
+	addonArrayFix,
 	createChargeOnStripe,
 	checkOrder,
 	createOrder,
@@ -157,8 +158,11 @@ Meteor.methods({
 						takeProductItemStockByArray(addonArray, race_name);				
 						let addonText = getAddonText(addonArray, country, race_name);
 						
+						// fix addon array index;
+						let addonArrayFixed = addonArrayFix(addonArray, race_name);			
+						
 						// add addonArray and addonText to values
-						values['addonArray'] = addonArray;
+						values['addonArray'] = addonArrayFixed;
 						values['addOn'] = addonText;
 					}; 
 
