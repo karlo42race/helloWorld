@@ -70,10 +70,10 @@ Meteor.methods({	 // payment using stripe
 				let addonText = getAddonText(addonArray, country, race_name);	
 
 				// fix addon array index;
-				let addonArrayFix = addonArrayFix(addonArray, race_name);			
+				let addonArrayFixed = addonArrayFix(addonArray, race_name);			
 				
 				// add addonArray and addonText to values
-				values['addonArray'] = addonArrayFix;
+				values['addonArray'] = addonArrayFixed;
 				values['addOn'] = addonText;				
 			}; 
 			// end addon check
