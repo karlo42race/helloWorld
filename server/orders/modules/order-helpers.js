@@ -5,7 +5,7 @@ import { AllResults, Countries, Coupons, Orders, OrderNumber, ProductItems, Team
 const Stripe = require("stripe")("sk_live_TEPWTflfLxs5O8RzQXjqhnRx");
 
 const addonArrayFix = (addonArray, race_name) => {
-	let productAddons = ProductItems.find({ race: race_name }).fetch();
+	let productAddons = ProductItems.find({ race: race_name }, {sort: {position: 1} }).fetch();
 	let newArray = [];
 	_.each(addonArray, (c) => {
 		let addonIndex = productAddons.findIndex(x => x.item_name == c.item);	
@@ -13,10 +13,6 @@ const addonArrayFix = (addonArray, race_name) => {
 		newAddon.index = parseInt(addonIndex) + 1;
 		newArray.push(newAddon);
 	});
-	console.log('old array is:');
-	console.log(addonArray);
-	console.log('new array is:');
-	console.log(newArray);
 
 	return newArray;
 };
