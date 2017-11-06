@@ -4,6 +4,21 @@ import { AllResults, Countries, Coupons, Orders, OrderNumber, ProductItems, Team
 // stripe
 const Stripe = require("stripe")("sk_live_TEPWTflfLxs5O8RzQXjqhnRx");
 
+const addonArrayFix = (addonArray, race_name) => {
+	let productAddons = ProductItems.find({ race: race_name }).fetch();
+	let newArray = [];
+	_.each(addonArray, (c) => {
+		let addonIndex = productAddons.findIndex(x => x.item_name == c.item);	
+		let newAddon = c;
+		newAddon.index = parseInt(addonIndex) + 1;
+		newArray.push(newAddon);
+	});
+	console.log(`old array is ${addonArray}`);
+	console.log(`new array is ${newArray}`);
+
+	return newArray;
+};
+
 const createChargeOnStripe = (options) => {
 	return new Promise((resolve, reject) => {
 		Stripe.charges.create(options, (error, response) => {
@@ -498,6 +513,7 @@ const returnProductItemStock = (addon, race_name) => {
 }
 
 export { 
+	addonArrayFix,
 	createChargeOnStripe,
 	checkAddonCountry,
 	checkOrder,

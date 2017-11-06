@@ -2,6 +2,7 @@ import { check } from 'meteor/check';
 import { AllResults, Countries, Coupons, Orders, OrderNumber, ProductItems, VirtualRaces } from '/imports/api/collections.js';
 import { OrderEmailToAdmin, OrderEmailToUser, OrderFreeEmailToAdmin, OrderFreeEmailToUser, OrderEmailToBuddy, OrderEmailToUserWithBuddy } from '../emails/order-emails'
 import { 
+	addonArrayFix,
 	createChargeOnStripe,
 	checkAddonCountry,
 	checkOrder,
@@ -66,13 +67,18 @@ Meteor.methods({	 // payment using stripe
 			if(addonArray && addonArray.length > 0) {
 				// add on stuff							
 				takeProductItemStockByArray(addonArray, race_name);
-				let addonText = getAddonText(addonArray, country, race_name);				
+				let addonText = getAddonText(addonArray, country, race_name);	
+
+				// fix addon array index;
+				let addonArrayFix = addonArrayFix(addonArray, race_name);			
 				
 				// add addonArray and addonText to values
-				values['addonArray'] = addonArray;
-				values['addOn'] = addonText;
+				values['addonArray'] = addonArrayFix;
+				values['addOn'] = addonText;				
 			}; 
 			// end addon check
+			console.log(`Orders creat, Values is ${values}`);
+
 
 			// for promoCode
 			let coupon_type;
