@@ -137,7 +137,16 @@ const createOrder = (raceData, values, currentUser, orderNum, checkout_url) => {
 	
 	let discountToAdd = discount || 0;
 	let grossPrice = price + discountToAdd;
-
+	
+	// check if unit_number has #
+	if(unit_number) {
+		let firstUnitNumber = unit_number.charAt(0);
+		let currentUnit = unit_number;
+		if(firstUnitNumber !== '#')	
+			unit_number = '#' + currentUnit;
+	};
+	
+		
 	Orders.insert({
 		orderNum,
 		product_name: race_name, 
