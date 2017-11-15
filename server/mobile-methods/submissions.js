@@ -1,5 +1,5 @@
 import { check, Match } from 'meteor/check';
-import { AllResults, Submissions, Comments, Following } from '/imports/api/collections.js';
+import { AllResults, Submissions, Comments, FeedsTopics, Following } from '/imports/api/collections.js';
 
 Meteor.methods({
 	// for feeds and following
@@ -90,4 +90,14 @@ Meteor.methods({
 
 	},
 
+	'submissions.getFeedsTopics'() {
+		let options = {
+			limit: 5,		
+			sort: {position: 1},
+		};
+		console.log(`getFeedsTopics`);
+		let topics = FeedsTopics.find({}, options).fetch();
+		console.log(topics);
+		return topics;
+	}
 })
