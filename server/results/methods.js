@@ -8,7 +8,7 @@ Meteor.methods({
 		let userResults = AllResults.find({ userID: this.userId }).fetch();
 		_.each(userResults, (c) => {
 			let raceName = c.race;		
-			let { bib_number, raceID, race, race_type, timing, timing_per_km, team, userID, user_name, distance, category } = c;
+			let { _id, bib_number, raceID, race, race_type, timing, timing_per_km, team, userID, user_name, distance, category } = c;
 			let oneRace = VirtualRaces.findOne({_id: raceID});
 			if(oneRace) {
 				let { start_date, end_date, race_name_lang } = oneRace;
@@ -18,6 +18,7 @@ Meteor.methods({
 			
 				if ((today.getTime() <= endDate.getTime() && today.getTime() >= startDate.getTime())) {
 					let raceObj = {
+						_id,
 						bib_number, 
 						category,
 						distance,
