@@ -27,21 +27,20 @@ Meteor.methods({
 		let { motto, name, first_name, last_name, phone, country_code, nric, gender, birthday } = value;
 		
 		console.log(`Updating user profile for ${name}`);		
-
+		console.log(country_code);
+		// console.log(country_code.length);
 		if (phone === null)
 			throw new Meteor.Error('field-missing', 'Error: Please fill in all the fields');
 		if(!name || !first_name || !last_name || !phone )
 			throw new Meteor.Error('field-missing', 'Error: Please fill in all the fields');
+
 		if(phone && phone.toString().length<4) {
 			throw new Meteor.Error('phone-error', 'Error: Fill in correct phone number');
 		}
 		else if (isNaN(phone) || phone === 0) {
 			throw new Meteor.Error('phone-error', 'Error: Fill in correct phone number');
 		}
-		if(country_code === null || country_code.length === 0) {
-			throw new Meteor.Error('phone-error', 'Error: Fill in correct country code');
-		}
-		else if(!country_code && country_code.length > 4) {
+		if(!country_code || country_code === null || country_code.toString().length === 0 || country_code.toString().length > 3) {
 			throw new Meteor.Error('phone-error', 'Error: Fill in correct country code');
 		}
 
