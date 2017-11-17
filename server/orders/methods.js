@@ -30,7 +30,7 @@ Meteor.methods({	 // payment using stripe
 		console.log(loggingData);
 				
 		let { race_name } = raceData;
-		let { email, priceInCents, currency, addonArray, country } = values;
+		let { email, priceInCents, currency, addonArray, country, unit_number } = values;
 		let { profile } = currentUser;
 		let userId = this.userId;
 		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);
@@ -40,6 +40,18 @@ Meteor.methods({	 // payment using stripe
 		if(!email || (email == ''))
 			throw new Meteor.Error('no-email', 'Error: no email, add email on your dashboard');
 
+		if (unit_number === null || !unit_number) {
+			unit_number = "";
+		}
+		var matchesHash = unit_number.split("#").length - 1;
+		var matchesDash = unit_number.split("-").length - 1;
+		if (matchesHash === 0) {
+			unit_number = "#"+unit_number;
+		}
+		if (matchesDash === 0) {
+			unit_number +="-";
+		}
+		// console.log(unit_number);
 		check(token.id, String); // check stripeToken is string
 		checkOrder( userId, raceData );	// check if user has register for race
 		checkAddonCountry(addonArray, values, race_name); // check if addon can be delivered to shipping country

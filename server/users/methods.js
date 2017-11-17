@@ -27,13 +27,22 @@ Meteor.methods({
 		let { motto, name, first_name, last_name, phone, country_code, nric, gender, birthday } = value;
 		
 		console.log(`Updating user profile for ${name}`);		
-		
+		console.log(country_code);
+		// console.log(country_code.length);
+		if (phone === null)
+			throw new Meteor.Error('field-missing', 'Error: Please fill in all the fields');
 		if(!name || !first_name || !last_name || !phone )
 			throw new Meteor.Error('field-missing', 'Error: Please fill in all the fields');
-		if(phone && phone.length<4)
+
+		if(phone && phone.toString().length<4) {
 			throw new Meteor.Error('phone-error', 'Error: Fill in correct phone number');
-		if(!country_code && country_code.length > 4)
+		}
+		else if (isNaN(phone) || phone === 0) {
+			throw new Meteor.Error('phone-error', 'Error: Fill in correct phone number');
+		}
+		if(!country_code || country_code === null || country_code.toString().length === 0 || country_code.toString().length > 3) {
 			throw new Meteor.Error('phone-error', 'Error: Fill in correct country code');
+		}
 
 		Meteor.users.update({
 			_id: this.userId
@@ -90,12 +99,19 @@ Meteor.methods({
 	// update user address
 	'users.updateAddress'(value) {		
 		console.log(`Logging: users updateAddress`);
-		console.log(value);
+		// console.log(value);
 		
 		let { address, address2, unit_number, country, postal } = value;
-		if(!address || !country)
+		if(address === null || country === null) {
+			throw new Meteor.Error('missing-value', 'address and country must not be null');
+		}
+		else if(!address || !country) {
 			throw new Meteor.Error('missing-value', 'Please fill in address and country');
-
+		}
+		else if(address.length < 3 || country.length < 3) {
+			throw new Meteor.Error('missing-value', 'address and country is less');
+		}
+		console.log(value);
 		let currentUser = Meteor.users.findOne({_id: this.userId});		
 		
 		// update addressUpdate by and time;
