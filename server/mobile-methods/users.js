@@ -109,6 +109,35 @@ Meteor.methods({
 
 	},
 
+	'users.publicSearchUsers'(searchText, limit, skipCount) {
+		var filter = new RegExp(searchText, 'i');
+		let filterBy = { $or: [ 
+								{ 'publicID': parseInt(searchText) }, 
+						  		{ 'profile.first_name': filter }, 
+						  		{ 'profile.last_name': filter }, 
+						  		{ 'profile.name': filter }
+							]}
+		
+		if (searchText == '') {
+			filterBy = {_id: 1234}
+		}
+		
+		let fields = {
+			'profile.name': 1, 
+			'profilePic': 1, 		
+			'publicID': 1
+		}
+		var options = {
+			limit: limit,		
+			skip: skipCount,
+			sort: {name: 1},
+			fields: fields
+		};	
+
+		// Counts.publish(this, 'dataCount', Meteor.users.find(filterBy), {nonReactive: true});
+	  return Meteor.users.find( filterBy, options ).fetch();
+	},
+
 	// return race details by badge_color url;
 	'users.showCompleteBadge'(badge_color) {
 		let oneRace = VirtualRaces.findOne({badge_color: badge_color});
