@@ -109,7 +109,7 @@ Meteor.methods({
 
 	},
 
-	'users.publicSearchUsers'(searchText, limit, skipCount) {
+	'users.publicSearchUsers1'(searchText, limit, skipCount) {
 		var filter = new RegExp(searchText, 'i');
 		let filterBy = { $or: [ 
 								{ 'publicID': parseInt(searchText) }, 
@@ -135,9 +135,26 @@ Meteor.methods({
 		};	
 
 		// Counts.publish(this, 'dataCount', Meteor.users.find(filterBy), {nonReactive: true});
-	  return Meteor.users.find( filterBy, options ).fetch();
+		let data = Meteor.users.find( filterBy, options ).fetch();
+	    return  data;
 	},
 
+	'users.publicSearchUsers2'(value, limit) {
+		var filter = new RegExp(value, 'i');
+  		filterInt = parseInt(value);
+  		fields = { $or: [ 
+					  			{ 'emails.address': filter }, 
+					  			{ 'profile.name': filter }, 
+					  			{ 'publicID': filterInt } 
+								]}
+		var options = {
+			limit,		
+			sort: {'profile.name': -1},
+		};
+
+		// Counts.publish(this, 'dataCount', Meteor.users.find(fields), {nonReactive: true});
+  		return Meteor.users.find(fields, options).fetch();
+	},
 	// return race details by badge_color url;
 	'users.showCompleteBadge'(badge_color) {
 		let oneRace = VirtualRaces.findOne({badge_color: badge_color});
