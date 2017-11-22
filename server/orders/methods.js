@@ -36,6 +36,9 @@ Meteor.methods({	 // payment using stripe
 		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);
 		
 		checkProfile(profile);
+		// check country exists
+		if(!country || (country == ''))
+			throw new Meteor.Error('no-country', 'Error: no country, add country on param');
 		// check email exists
 		if(!email || (email == ''))
 			throw new Meteor.Error('no-email', 'Error: no email, add email on your dashboard');
