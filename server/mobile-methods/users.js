@@ -124,7 +124,9 @@ Meteor.methods({
 		
 		let fields = {
 			'profile.name': 1, 
-			'profilePic': 1, 		
+			// 'profilePic': 1, 
+			'emails.address':1,
+			'phone':1,	
 			'publicID': 1
 		}
 		var options = {
@@ -153,6 +155,8 @@ Meteor.methods({
 		};
 
 		// Counts.publish(this, 'dataCount', Meteor.users.find(fields), {nonReactive: true});
+		// let user_publicID = parseInt(publicID);
+		// return Meteor.users.find({ _id: this.userId }, {fields: {} });
   		return Meteor.users.find(fields, options).fetch();
 	},
 	// return race details by badge_color url;
