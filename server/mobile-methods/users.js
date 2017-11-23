@@ -124,7 +124,7 @@ Meteor.methods({
 		
 		let fields = {
 			'profile.name': 1, 
-			// 'profilePic': 1, 
+			'profilePic': 1, 
 			'emails.address':1,
 			'phone':1,	
 			'publicID': 1
