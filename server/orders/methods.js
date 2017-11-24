@@ -35,8 +35,9 @@ Meteor.methods({	 // payment using stripe
 		let userId = this.userId;
 		let partner;
 		let partnerData = values.partner; 
+		console.log(partnerData);
 		if (partnerData) {
-			partner = Meteor.users.findOne({publicID: publicID[1]});
+			partner = Meteor.users.findOne({_id: partnerData._id});
 			console.log(partner);
 		}
 
