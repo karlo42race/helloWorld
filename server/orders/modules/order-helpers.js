@@ -247,7 +247,7 @@ const createResult = (raceData, values, currentUser) => {
 				race: raceData.race_name,
 				race_type: raceData.race_type, 
 				submissions: [],
-				userID: [userId, partnerData._id],
+				userID: [userID, partnerData._id],
 				user_name: [profile.name, partnerData.profile.name],
 				user_email: [email, partnerData.email],
 				target: 0,
