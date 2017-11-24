@@ -249,7 +249,7 @@ const createResult = (raceData, values, currentUser) => {
 				submissions: [],
 				userID: [userID, partnerData._id],
 				user_name: [profile.name, partnerData.profile.name],
-				user_email: [email, partner.emails[0].address],
+				user_email: [email, partnerData.emails[0].address],
 				target: 0,
 				timing: 0,
 				distance: 0,
