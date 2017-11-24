@@ -38,7 +38,7 @@ Meteor.methods({	 // payment using stripe
 		console.log(partnerData);
 		if (partnerData) {
 			partner = Meteor.users.findOne({_id: values.partner._id});
-			console.log(partner);
+			// console.log(partner);
 		}
 
 		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);
@@ -68,6 +68,7 @@ Meteor.methods({	 // payment using stripe
 		if (partner) {
 			checkOrder( partner._id, raceData );
 			console.log('Orders: check order for', race_name, 'by', partner.profile.name);
+			values['runner'] = 2;
 		}
 		checkAddonCountry(addonArray, values, race_name); // check if addon can be delivered to shipping country
 		checkPrice(values, race_name); // check if price is correct
