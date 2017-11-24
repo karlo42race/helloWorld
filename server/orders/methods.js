@@ -219,6 +219,9 @@ Meteor.methods({	 // payment using stripe
 			// create order for user
 			let { collection1, collection2 } = values;
 			values.runner = 1;
+			// add status of payment to paid
+			values['status'] = 'paid';
+
 			// collection point for user
 			values.collection = collection1;
 
