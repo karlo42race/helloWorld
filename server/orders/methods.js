@@ -64,7 +64,10 @@ Meteor.methods({	 // payment using stripe
 		// console.log(unit_number);
 		check(token.id, String); // check stripeToken is string
 		checkOrder( userId, raceData );	// check if user has register for race
-		checkOrder( partner._id, raceData );
+		if (partner) {
+			checkOrder( partner._id, raceData );
+			console.log('Orders: check order for', race_name, 'by', partner.profile.name);
+		}
 		checkAddonCountry(addonArray, values, race_name); // check if addon can be delivered to shipping country
 		checkPrice(values, race_name); // check if price is correct
 
@@ -80,7 +83,12 @@ Meteor.methods({	 // payment using stripe
     })
 		.then((charge) => {
 			console.log('Stripes: success charge is', charge.outcome);
-  		console.log('Orders: Inserting order for', race_name, 'by', profile.name); 		
+			if (!Array.isArray(profile.name)) {
+				console.log('Orders: Inserting order for', race_name, 'by', profile.name);
+			}
+			else {
+				console.log('Orders: Inserting order for', race_name, 'by', profile.name[0]);
+			}
 			
 			// add status of payment to paid
 			values['status'] = 'paid';
@@ -120,8 +128,9 @@ Meteor.methods({	 // payment using stripe
 			// create order
 			createOrder(raceData, values, currentUser, orderNum, checkout_url);	
 
-			if (partner) {
-				createOrder(raceData, values, partner, orderNum, checkout_url);	
+			if (partner) { // create order for partner
+				createOrder(raceData, values, partner, orderNum, checkout_url);
+				console.log('create order for partner');
 			}	
 
 			Meteor.defer(() => {				
@@ -129,6 +138,7 @@ Meteor.methods({	 // payment using stripe
 				takeStock(raceData, values); // minus stock for race category;
 				if (partner) {
 					takeStock(raceData, values); // for partner stock take
+					console.log('takeStock for partner');
 				}	
 				// 4. RESULTS - create
 				createResult(raceData, values, currentUser);
