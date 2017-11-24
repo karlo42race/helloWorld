@@ -37,7 +37,7 @@ Meteor.methods({	 // payment using stripe
 		let partnerData = values.partner; 
 		console.log(partnerData);
 		if (partnerData) {
-			partner = Meteor.users.findOne({_id: partnerData._id});
+			partner = Meteor.users.findOne({_id: values.partner._id});
 			console.log(partner);
 		}
 
@@ -130,7 +130,12 @@ Meteor.methods({	 // payment using stripe
 			createOrder(raceData, values, currentUser, orderNum, checkout_url);	
 
 			if (partner) { // create order for partner
-				createOrder(raceData, values, partner, orderNum, checkout_url);
+				let partnerValues = [values copy];
+				partnerValues['userID'] = partner._id;
+				partnerValues['email'] = partner.emails[0].address;
+				partnerValues['phone'] = partner.phone;
+				partnerValues['addressBelongsTo'] = profile.name;
+				createOrder(raceData, partnerValues, partner, orderNum, checkout_url);
 				console.log('create order for partner');
 			}	
 
