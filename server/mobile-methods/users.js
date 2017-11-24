@@ -109,7 +109,7 @@ Meteor.methods({
 
 	},
 
-	'users.publicSearchUsers1'(searchText, limit, skipCount) {
+	'users.publicSearchUsers'(searchText, limit, skipCount) {
 		var filter = new RegExp(searchText, 'i');
 		let filterBy = { $or: [ 
 								{ 'publicID': parseInt(searchText) }, 
@@ -141,24 +141,24 @@ Meteor.methods({
 	    return  data;
 	},
 
-	'users.publicSearchUsers2'(value, limit) {
-		var filter = new RegExp(value, 'i');
-  		filterInt = parseInt(value);
-  		fields = { $or: [ 
-					  			{ 'emails.address': filter }, 
-					  			{ 'profile.name': filter }, 
-					  			{ 'publicID': filterInt } 
-								]}
-		var options = {
-			limit,		
-			sort: {'profile.name': -1},
-		};
+	// 'users.publicSearchUsers2'(value, limit) {
+	// 	var filter = new RegExp(value, 'i');
+ //  		filterInt = parseInt(value);
+ //  		fields = { $or: [ 
+	// 				  			{ 'emails.address': filter }, 
+	// 				  			{ 'profile.name': filter }, 
+	// 				  			{ 'publicID': filterInt } 
+	// 							]}
+	// 	var options = {
+	// 		limit,		
+	// 		sort: {'profile.name': -1},
+	// 	};
 
-		// Counts.publish(this, 'dataCount', Meteor.users.find(fields), {nonReactive: true});
-		// let user_publicID = parseInt(publicID);
-		// return Meteor.users.find({ _id: this.userId }, {fields: {} });
-  		return Meteor.users.find(fields, options).fetch();
-	},
+	// 	// Counts.publish(this, 'dataCount', Meteor.users.find(fields), {nonReactive: true});
+	// 	// let user_publicID = parseInt(publicID);
+	// 	// return Meteor.users.find({ _id: this.userId }, {fields: {} });
+ //  		return Meteor.users.find(fields, options).fetch();
+	// },
 	// return race details by badge_color url;
 	'users.showCompleteBadge'(badge_color) {
 		let oneRace = VirtualRaces.findOne({badge_color: badge_color});

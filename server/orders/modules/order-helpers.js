@@ -236,31 +236,55 @@ const createResult = (raceData, values, currentUser) => {
 	let { profile, publicID } = currentUser,
 			gender = profile.gender,
 			user_name = profile.name;
-	
+	let partnerData = values.partner; 
 	let resultExists = AllResults.findOne({userID: userID, raceID: _id});
 	if (resultExists) {
 		console.log('Error: in createResult, user', user_name, userID, 'already has result for', race_name);
-	} else {									
-		AllResults.insert({
-			raceID: _id,
-			race: race_name,
-			race_type,
-			submissions: [],
-			userID, 	
-			user_name,
-			user_email: email, 
-			target: 0,
-			timing: 0,
-			distance: 0,
-			position: 0,
-			category,
-			bib_number: publicID,
-			timing_per_km: 0,
-			team: team || '',
-			gender,
-			createdAt: new Date()	
-		});
-		console.log('AllResults: creating new allResults: ', user_name, 'complete');	
+	} else {
+		if (partnerData) {
+			AllResults.insert({
+				raceID: raceData._id, 
+				race: raceData.race_name,
+				race_type: raceData.race_type, 
+				submissions: [],
+				userID: [userId, partnerData._id],
+				user_name: [profile.name, partnerData.profile.name],
+				user_email: [email, partnerData.email],
+				target: 0,
+				timing: 0,
+				distance: 0,
+				position: 0,
+				category: values.category, 
+				bib_number: [currentUser.publicID, partnerData.publicID],
+				timing_per_km: 0,
+				team: values.team,
+				gender: '',
+				createdAt: new Date()
+			});
+			console.log('AllResults: creating new allResults: ', profile.name, partnerData.profile.name, 'complete');
+		}
+		else {
+			AllResults.insert({
+				raceID: _id,
+				race: race_name,
+				race_type,
+				submissions: [],
+				userID, 	
+				user_name,
+				user_email: email, 
+				target: 0,
+				timing: 0,
+				distance: 0,
+				position: 0,
+				category,
+				bib_number: publicID,
+				timing_per_km: 0,
+				team: team || '',
+				gender,
+				createdAt: new Date()
+			});
+			console.log('AllResults: creating new allResults: ', user_name, 'complete');
+		}
 
 		if(team && (team !== '')) 
 			addTeamCount(_id, team);	

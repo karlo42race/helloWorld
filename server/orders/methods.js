@@ -34,13 +34,13 @@ Meteor.methods({	 // payment using stripe
 		let { publicID, profile } = currentUser;
 		let userId = this.userId;
 		let partner;
-
-		if (Array.isArray(publicID)) {
+		let partnerData = values.partner; 
+		if (partnerData) {
 			partner = Meteor.users.findOne({publicID: publicID[1]});
+			console.log(partner);
 		}
 
 		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);
-		console.log(partner);
 		
 		checkProfile(profile);
 		// check country exists
