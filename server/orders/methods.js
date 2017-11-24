@@ -31,9 +31,16 @@ Meteor.methods({	 // payment using stripe
 				
 		let { race_name } = raceData;
 		let { email, priceInCents, currency, addonArray, country, unit_number } = values;
-		let { profile } = currentUser;
+		let { publicID, profile } = currentUser;
 		let userId = this.userId;
+		let partner;
+
+		if (Array.isArray(publicID)) {
+			partner = Meteor.users.findOne({publicID: publicID[1]});
+		}
+
 		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);
+		console.log(partner);
 		
 		checkProfile(profile);
 		// check country exists
@@ -57,6 +64,7 @@ Meteor.methods({	 // payment using stripe
 		// console.log(unit_number);
 		check(token.id, String); // check stripeToken is string
 		checkOrder( userId, raceData );	// check if user has register for race
+		checkOrder( partner._id, raceData );
 		checkAddonCountry(addonArray, values, race_name); // check if addon can be delivered to shipping country
 		checkPrice(values, race_name); // check if price is correct
 
@@ -108,12 +116,20 @@ Meteor.methods({	 // payment using stripe
 			// end for promoCode
 			
 			values['userID'] = userId;
+
 			// create order
-			createOrder(raceData, values, currentUser, orderNum, checkout_url);			
+			createOrder(raceData, values, currentUser, orderNum, checkout_url);	
+
+			if (partner) {
+				createOrder(raceData, values, partner, orderNum, checkout_url);	
+			}	
 
 			Meteor.defer(() => {				
 
 				takeStock(raceData, values); // minus stock for race category;
+				if (partner) {
+					takeStock(raceData, values); // for partner stock take
+				}	
 				// 4. RESULTS - create
 				createResult(raceData, values, currentUser);
 				// 5. SEND EMAIL				
