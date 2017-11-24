@@ -130,7 +130,7 @@ Meteor.methods({	 // payment using stripe
 			createOrder(raceData, values, currentUser, orderNum, checkout_url);	
 
 			if (partner) { // create order for partner
-				let partnerValues = values;
+				var partnerValues = Object.assign({}, values);
 				partnerValues['userID'] = partner._id;
 				partnerValues['email'] = partner.emails[0].address;
 				partnerValues['phone'] = partner.phone;
