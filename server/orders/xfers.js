@@ -108,6 +108,8 @@ Meteor.methods({
 		console.log('Xfers charge called');
 		
 		let userId = this.userId;
+		// check if userId has already registered to this race
+		checkOrder( userId, raceData );
 		values['userID'] = userId;
 		values['status'] = 'pending';
 
