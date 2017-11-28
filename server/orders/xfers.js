@@ -203,7 +203,7 @@ Meteor.methods({
 						partnerValues['userID'] = partner._id;
 						partnerValues['email'] = partner.emails[0].address;
 						partnerValues['phone'] = partner.phone;
-						partnerValues['addressBelongsTo'] = partner.profile.name;
+						partnerValues['addressBelongsTo'] = userData.profile.name;
 						createOrder(raceData, partnerValues, partner, orderNum, checkout_url);
 						console.log('create order for partner');
 					}	
