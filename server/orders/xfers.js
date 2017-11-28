@@ -113,6 +113,18 @@ Meteor.methods({
 		values['userID'] = userId;
 		values['status'] = 'pending';
 
+
+		let partner;
+		let partnerData = values.partner; 
+		if (partnerData) {
+			partner = Meteor.users.findOne({_id: values.partner._id});
+			// console.log(partner);
+			if (partner) {
+				checkOrder( partner._id, raceData );
+				console.log('Orders: check order for', race_name, 'by', partner.profile.name);
+				values['runner'] = 2;
+			}
+		}
 		// let { address, address2, unit_number, country, postal } = values;
 		// let addressDetails = `${address} ${address2} ${unit_number} ${country} ${postal}`;
 		const orderNum = getOrderNumber();
@@ -188,6 +200,16 @@ Meteor.methods({
 					
 					// create order with pending status
 					createOrder(raceData, values, userData, orderNum, checkout_url);
+
+					if (partner) { // create order for partner
+						var partnerValues = Object.assign({}, values);
+						partnerValues['userID'] = partner._id;
+						partnerValues['email'] = partner.emails[0].address;
+						partnerValues['phone'] = partner.phone;
+						partnerValues['addressBelongsTo'] = profile.name;
+						createOrder(raceData, partnerValues, partner, orderNum, checkout_url);
+						console.log('create order for partner');
+					}	
 				};
 			}		
 
