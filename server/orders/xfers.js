@@ -96,7 +96,7 @@ const sendEmailWithOrderId = (orderId) => {
 Meteor.methods({
 	'xfers.charge'(raceData, values, userData) {		
     this.unblock();
-		
+		let partner;
 		let loggingData = {
 			raceData: raceData,
 			values: values,
@@ -113,18 +113,6 @@ Meteor.methods({
 		values['userID'] = userId;
 		values['status'] = 'pending';
 
-
-		let partner;
-		let partnerData = values.partner; 
-		if (partnerData) {
-			partner = Meteor.users.findOne({_id: values.partner._id});
-			// console.log(partner);
-			if (partner) {
-				checkOrder( partner._id, raceData );
-				console.log('Orders: check order for', race_name, 'by', partner.profile.name);
-				values['runner'] = 2;
-			}
-		}
 		// let { address, address2, unit_number, country, postal } = values;
 		// let addressDetails = `${address} ${address2} ${unit_number} ${country} ${postal}`;
 		const orderNum = getOrderNumber();
@@ -135,7 +123,16 @@ Meteor.methods({
 		const IndoPrice = priceInCents / 100;		
 
 		checkPrice(values, race_name); // check if price is correct
-		
+		let partnerData = values.partner; 
+		if (partnerData) {
+			partner = Meteor.users.findOne({_id: values.partner._id});
+			// console.log(partner);
+			if (partner) {
+				checkOrder( partner._id, raceData );
+				console.log('Orders: check order for', race_name, 'by', partner.profile.name);
+				values['runner'] = 2;
+			}
+		}
 		// check email exists
 		if(!email || (email == ''))
 			throw new Meteor.Error('no-email', 'Error: no email, add email on your dashboard');
