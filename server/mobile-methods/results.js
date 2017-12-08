@@ -143,7 +143,7 @@ Meteor.methods({
 			})
 			
 			return [
-				// AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch(),
+				AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch(),
 				// Orders.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }, { fields: {'orderNum': 1, 'status': 1, 'race': 1 } }).fetch(),
 				VirtualRaces.find({end_date: { $gte: today }}, {fields: fields}).fetch()
 			]
