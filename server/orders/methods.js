@@ -75,7 +75,10 @@ Meteor.methods({	 // payment using stripe
 
 		let orderTimestamp = formatDate(new Date());		
     let orderNum = getOrderNumber(); // get order number 
-
+	if (partnerData) {
+		priceInCents = priceInCents*2;
+		console.log(priceInCents);
+	}
     return createChargeOnStripe({
       source: token.id,
       amount: priceInCents, // this is equivalent to $9.90
