@@ -25,12 +25,12 @@ import {
 	sendEmailToUser } from './modules/order-helpers';
 
 // production key and url;
-const xfersUserApi = "yGfmVQrAr1y9c_aytbZw4ZW4rfUxugMDJzdyRQTxXtc";
-const xfersUrl = "https://id.xfers.com/api/v3";
+// const xfersUserApi = "yGfmVQrAr1y9c_aytbZw4ZW4rfUxugMDJzdyRQTxXtc";
+// const xfersUrl = "https://id.xfers.com/api/v3";
 
 // development sandbox key
-// const xfersUserApi = "21Yk2GcY-z8eD_857t5g7mXbvgfaYc4xKdsxx1cGhXM";
-// const xfersUrl = "https://sandbox-id.xfers.com/api/v3";
+const xfersUserApi = "21Yk2GcY-z8eD_857t5g7mXbvgfaYc4xKdsxx1cGhXM";
+const xfersUrl = "https://sandbox-id.xfers.com/api/v3";
 
 const createResultWithOrder = (oneOrder) => {
 
@@ -120,7 +120,7 @@ Meteor.methods({
 		let { race_name } = raceData;
 		let { first_name, last_name } = userData.profile;
 		let desc = `Order for ${race_name} - order Id: ${orderNum}`;
-		const IndoPrice = priceInCents / 100;		
+		let IndoPrice = priceInCents / 100;		
 
 		checkPrice(values, race_name); // check if price is correct
 		let partnerData = values.partner; 
@@ -131,6 +131,7 @@ Meteor.methods({
 				checkOrder( partner._id, raceData );
 				console.log('Orders: check order for', race_name, 'by', partner.profile.name);
 				values['runner'] = 2;
+				IndoPrice = IndoPrice * 2;
 			}
 		}
 		// check email exists
@@ -154,9 +155,13 @@ Meteor.methods({
 					items: [{description: desc, name: desc, price: IndoPrice, quantity: 1}],
 					meta_data: { firstname: first_name, lastname: last_name },
 					// user_phone_no: "+6592989598",
-					return_url: `https://web.42race.com/order/complete/${race_name}`,
-					notify_url: "https://web.42race.com/api/order/confirm",
-					cancel_url: `https://web.42race.com/test/order/cancel/${orderNum}`
+					return_url: `https://client-42race-staging.herokuapp.com/order/complete/${race_name}`,
+					notify_url: "https://client-42race-staging.herokuapp.com/api/order/confirm",
+					cancel_url: `https://client-42race-staging.herokuapp.com/test/order/cancel/${orderNum}`
+					// production
+					// return_url: `https://web.42race.com/order/complete/${race_name}`,
+					// notify_url: "https://web.42race.com/api/order/confirm",
+					// cancel_url: `https://web.42race.com/test/order/cancel/${orderNum}`
 				}
 			});
 			if(result) {
