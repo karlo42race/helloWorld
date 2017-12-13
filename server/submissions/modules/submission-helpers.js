@@ -1,5 +1,5 @@
 import { check } from 'meteor/check';
-import { AllResults, VirtualRaces, UserMeta } from '/imports/api/collections.js';
+import { AllResults, VirtualRaces, UserMeta, Submissions } from '/imports/api/collections.js';
 import { AlertFraudToAdmin } from '/server/emails/fraud-alert-emails';
 
 const updateOneResult = (resultId, timing, distance, timing_per_km) => {
@@ -47,6 +47,11 @@ const addSubmitBy = (resultID, userID) => {
 	});
 }
 
+const getRulesByCategory = (categoryId, rules) => {
+    let result_rules = rules.find((rule) => { return rule.category === categoryId});
+    return result_rules;
+
+};
 const updateRaceResult = (resultId, values, submissionId, userID) => {
 	// update result
 	let result = AllResults.findOne({_id: resultId}),			
@@ -117,16 +122,27 @@ const updateRaceResult = (resultId, values, submissionId, userID) => {
 			}
 		}
 	}
+    let all_submissions = Submissions.findOne({ _id: submissionId });
+    if (result.race_type==='hell_week'){
+        let rule = getRulesByCategory(result.category, oneRace.rules);
+        // If user already made all the submission
+        let user_pace =   Math.round(parseInt(timingInSec) / distance);
+        if (result.submissions.length >= rule.submissions || user_pace < rule.pace || distance<rule.distance){
+            throw new Meteor.Error('race-submitted-hell-week-eligible', 'Not eligible for hell week. Will be added in personal record.');
+            return
+        }
+    }
 
-	// add new submission
-	AllResults.update(
-	{_id: resultId}, {
-		$push: {
-			submissions: submissionId
-		}
-	});
-		
-	let { category, race_type, race_name } = result;
+    // add new submission
+    AllResults.update(
+        {_id: resultId}, {
+            $push: {
+                submissions: submissionId,
+                all_submission_distance: all_submissions.distance
+            }
+        });
+
+    let { category, race_type, race_name } = result;
 
 	let initialDistance = result.distance;
 			initialTimingInSec = result.timing;

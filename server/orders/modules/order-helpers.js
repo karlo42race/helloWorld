@@ -281,6 +281,7 @@ const createResult = (raceData, values, currentUser) => {
 				timing_per_km: 0,
 				team: team || '',
 				gender,
+        all_submission_distance: [],
 				createdAt: new Date()
 			});
 			console.log('AllResults: creating new allResults: ', user_name, 'complete');
