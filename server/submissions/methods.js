@@ -170,6 +170,7 @@ Meteor.methods({
                             { $pull: {
                                 submissions: id,
                             }});
+                        console.log('Error: Submission will not be taken in account for Hell Week');
 
                     }
                     else{
@@ -239,15 +240,25 @@ Meteor.methods({
 
         // update AllResults
         let results = AllResults.find({submissions: submissionID }).fetch();
+
+
         if (results) {
             console.log('AllResults: updating results affected by submission: ', submissionID, '..');
             _.each(results, (c) => {
-                let allSubmissions = c.submissions;
-                let newAllSubmissionsDistance = c.all_submission_distance;
-                let submissionIndex = allSubmissions.indexOf(submissionID);
-                if (submissionIndex > -1 ){
-                    newAllSubmissionsDistance.splice(allSubmissions.indexOf(submissionID), 1);
+                if (c.race_type==="hell_week"){
+                    let allSubmissions = c.submissions;
+                    let newAllSubmissionsDistance = c.all_submission_distance;
+                    let submissionIndex = allSubmissions.indexOf(submissionID);
+                    if (submissionIndex > -1 ){
+                        newAllSubmissionsDistance.splice(allSubmissions.indexOf(submissionID), 1);
+                    }
+                    AllResults.update(
+                        {_id: c._id},
+                        { $set: {
+                            all_submission_distance: newAllSubmissionsDistance,
+                        }},)
                 }
+
                 var resultID = c._id;
                 let oldResultDistance = c.distance;
                 let oldResultTiming = c.timing;
@@ -272,15 +283,12 @@ Meteor.methods({
                 AllResults.update(
                     {_id: resultID},
                     { $pull: {
-                        submissions: submissionID
+                        submissions: submissionID,
                     }
+
                     },
-                )
-                AllResults.update(
-                    {_id: resultID},
-                    { $set: {
-                        all_submission_distance: newAllSubmissionsDistance,
-                    }},)
+                );
+
                 if (c.submitBy) { //submitBy exists
                     AllResults.update(
                         {_id: resultID},
@@ -292,6 +300,7 @@ Meteor.methods({
                 }
                 console.log('AllResults updated for ', c._id, 'by user: ', c.user_name);
             });
+
         }
 
         Submissions.remove(submissionID);
