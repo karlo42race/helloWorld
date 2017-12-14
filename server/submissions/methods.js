@@ -1,5 +1,5 @@
 import { check, Match } from 'meteor/check';
-import { Submissions, AllResults, UserMeta } from '/imports/api/collections.js';
+import { Submissions, AllResults, UserMeta, VirtualRaces } from '/imports/api/collections.js';
 import {
     addToUserMeta,
     updateOneResult,
@@ -148,22 +148,40 @@ Meteor.methods({
         if (results.length > 0) {
             console.log('AllResults: updating results affected by submission: ', id, '..');
             _.each(results, (c) => {
-                let allSubmissions = c.submissions;
-                let newAllSubmissionsDistance = c.all_submission_distance;
-                let submissionIndex = allSubmissions.indexOf(id);
-                if (submissionIndex > -1 ){
-                    newAllSubmissionsDistance[submissionIndex] = newDistanceFix;
-                    AllResults.update(
-                        {_id: c._id}, {
-                            $set: { all_submission_distance: newAllSubmissionsDistance }
-                        });
-                }
                 var resultId = c._id;
                 let oldResultDistance = c.distance;
                 let oldResultTiming = c.timing;
                 let newResultDistance = oldResultDistance - oldDistance + distance;
                 newResultTiming = oldResultTiming - oldTimingInSec + timingInSec;
                 new_timing_per_km = Math.round(parseInt(newResultTiming) / newResultDistance);
+
+                if (c.race_type==="hell_week"){
+                    let allSubmissions = c.submissions;
+                    let newAllSubmissionsDistance = c.all_submission_distance;
+                    let submissionIndex = allSubmissions.indexOf(id);
+
+                    let oneRace = VirtualRaces.findOne({_id: c.raceID});
+                    let result_rule = oneRace.rules;
+                    let result_rules = result_rule.find((rule) => { return rule.category === c.category});
+                    if (new_timing_per_km < result_rules.pace || newDistanceFix<result_rules.distance){
+                        newAllSubmissionsDistance.splice(submissionIndex, 1);
+                        AllResults.update(
+                            {_id:  c._id},
+                            { $pull: {
+                                submissions: id,
+                            }});
+
+                    }
+                    else{
+                        if (submissionIndex > -1 ){
+                            newAllSubmissionsDistance[submissionIndex] = newDistanceFix;
+                        }
+                    }
+                    AllResults.update(
+                        {_id: c._id}, {
+                            $set: { all_submission_distance: newAllSubmissionsDistance }
+                        });
+                }
 
                 // ensure new distance only 2 decimal
                 newResultDistanceFix = Math.round(newResultDistance * 100) / 100;
