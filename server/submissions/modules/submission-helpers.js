@@ -122,8 +122,8 @@ const updateRaceResult = (resultId, values, submissionId, userID) => {
 			}
 		}
 	}
-    let all_submissions = Submissions.findOne({ _id: submissionId });
     if (result.race_type==='hell_week'){
+        let all_submissions = Submissions.findOne({ _id: submissionId });
         let rule = getRulesByCategory(result.category, oneRace.rules);
         // If user already made all the submission
         let user_pace =   Math.round(parseInt(timingInSec) / distance);
@@ -131,17 +131,15 @@ const updateRaceResult = (resultId, values, submissionId, userID) => {
             throw new Meteor.Error('race-submitted-hell-week-eligible', 'Not eligible for hell week. Will be added in personal record.');
             return
         }
+        AllResults.update(
+            {_id: resultId}, {
+                $push: {
+                    submissions: submissionId,
+                    all_submission_distance: all_submissions.distance
+                }
+            });
     }
-
-    // add new submission
-    AllResults.update(
-        {_id: resultId}, {
-            $push: {
-                submissions: submissionId,
-                all_submission_distance: all_submissions.distance
-            }
-        });
-
+	
     let { category, race_type, race_name } = result;
 
 	let initialDistance = result.distance;
