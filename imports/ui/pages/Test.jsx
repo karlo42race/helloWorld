@@ -30,17 +30,27 @@ class TestPage extends Component {
 	getData() {
 		let page = currentPage.get();
 		
-		let method = "users.getFollowers",
-				field1 = 11000,
-				field2 = 10,
-				field3 = 'followers',
-				field4 = 9.90,
-				field5 = 'sgd',
-				userArray = ["LadPXDt6urSre2k3o", "s8tWQPTJGdEzWdf8a"]
+		// let method = "users.getFollowers",
+		// 		field1 = 11000,
+		// 		field2 = 10,
+		// 		field3 = 'followers',
+		// 		field4 = 9.90,
+		// 		field5 = 'sgd',
+		// 		userArray = ["LadPXDt6urSre2k3o", "s8tWQPTJGdEzWdf8a"]
+
+		// let method = "orders.create",
+		// 		field1 = {race_name:"SCM Run 2017", _id:"dsjlkfioerw49"},
+		// 		field2 = {profile:{name:"kdfgl"}, publicID:"publicwieort"},
+		// 		field3 = {email:"email@email.com", priceInCents:10, currency:"SGD", addonArray:[], country:"Singapura", unit_number:"-0"},
+		// 		field4 = 9.90		
 		
+		let method = "dashboardResults",
+				field1 = 'current',
+				field2 = 0,
+				field3 = 10
 		if(Roles.userIsInRole(Meteor.user(), ['superadmin', 'admin']) ) {
 
-			Meteor.call(method, field1, field2, field3, field4, field5, (err, res) => {
+			Meteor.call(method, field1, field2, field3, (err, res) => {
 				if(err) {
 					console.log(err.reason);
 					alert(err.reason)
@@ -51,6 +61,15 @@ class TestPage extends Component {
 			});
 
 		} else {
+			Meteor.call(method, field1, field2, field3, (err, res) => {
+				if(err) {
+					console.log(err.reason);
+					alert(err.reason)
+				} else {
+					console.log(`res ${res}`);
+					this.setState({data: res});
+				}
+			});
 			alert('Test clicked');
 		};
 	}

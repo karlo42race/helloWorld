@@ -117,20 +117,20 @@ Meteor.methods({
 
 	// current, 0, 10
 	'dashboardResults'(type, skipCount, dataLimit) {
-		let racesArr = [],
-			  fields = {
-					'race_name': 1, 
-					'race_type': 1,
-					'start_date': 1,
-					'end_date': 1,
-					'bib_design': 1,
-					'cert_finish': 1,
-					'badge_grey': 1,
-					'badge_color': 1,
-					'banner_card': 1,
-					'slug': 1,
-					'hide_banner_on_dashboard': 1,
-				};
+		let racesArr = [];
+			 //  fields = {
+				// 	'race_name': 1, 
+				// 	'race_type': 1,
+				// 	'start_date': 1,
+				// 	'end_date': 1,
+				// 	'bib_design': 1,
+				// 	'cert_finish': 1,
+				// 	'badge_grey': 1,
+				// 	'badge_color': 1,
+				// 	'banner_card': 1,
+				// 	'slug': 1,
+				// 	'hide_banner_on_dashboard': 1,
+				// };
 
 		if (type == "current") {
 			let today = new Date();
@@ -143,9 +143,10 @@ Meteor.methods({
 			})
 			
 			return [
-				AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch(),
+				AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch(), 
 				// Orders.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }, { fields: {'orderNum': 1, 'status': 1, 'race': 1 } }).fetch(),
-				VirtualRaces.find({end_date: { $gte: today }}, {fields: fields}).fetch()
+				// VirtualRaces.find({end_date: { $gte: today }}, {fields: fields}).fetch()
+				VirtualRaces.find({end_date: { $gte: today }}).fetch()
 			]
 		};
 
@@ -177,7 +178,8 @@ Meteor.methods({
 			
 			return [		
 				AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }, options).fetch(),
-				VirtualRaces.find({ race_name: {$in: racesArr}}, {fields: fields}).fetch()	
+				// VirtualRaces.find({ race_name: {$in: racesArr}}, {fields: fields}).fetch()
+				VirtualRaces.find({end_date: { $gte: today }}).fetch()
 			];
 		};
 	},
