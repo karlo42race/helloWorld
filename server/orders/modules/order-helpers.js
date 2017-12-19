@@ -169,7 +169,7 @@ const createOrder = (raceData, values, currentUser, orderNum, checkout_url) => {
 		medal_engraving,
 		team: team || '', // for teams
 		currency,
-		addressBelongsTo: addressBelongsTo || name, // for partner runs
+		addressBelongsTo: addressBelongsTo || userID, // for partner runs
 		runnerNum: runner || 1, 										// for partner runs
 		addonArray,
 		addOn: addOn || '',
