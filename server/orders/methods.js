@@ -37,7 +37,7 @@ Meteor.methods({	 // payment using stripe
 		let partnerData = values.partner; 
 		console.log(partnerData);
 		if (raceData.no_of_runners > 1 && !partnerData){
-            throw new Meteor.Error('v1.2.5', 'Registration failed. The race you would want to register needs partner runner. Please update your 42race app to')
+            throw new Meteor.Error('v1.2.5', 'Registration failed. Please update to the latest app version to join this race.')
         }
 		if (partnerData) {
 			partner = Meteor.users.findOne({_id: values.partner._id});
