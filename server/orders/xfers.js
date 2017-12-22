@@ -157,7 +157,7 @@ Meteor.methods({
         checkPrice(values, race_name); // check if price is correct
         let partnerData = values.partner;
         if (raceData.no_of_runners > 1 && !partnerData){
-            throw new Meteor.Error('old-version', 'Registration failed. Please update your 42race app')
+            throw new Meteor.Error('v1.2.5', 'Registration failed. The race you would want to register needs partner runner. Please update your 42race app to')
         }
         if (partnerData) {
             partner = Meteor.users.findOne({_id: values.partner._id});
