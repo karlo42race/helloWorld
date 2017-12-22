@@ -42,6 +42,9 @@ Meteor.methods({	 // payment using stripe
 		if (partnerData) {
 			partner = Meteor.users.findOne({_id: values.partner._id});
 			// console.log(partner);
+			if (!partner.emails || !partner.emails[0] || !partner.emails[0].address) {
+				throw new Meteor.Error('no-email', 'Registration failed: Partner does not have email ');
+            }
 		}
 
 		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);
@@ -140,7 +143,7 @@ Meteor.methods({	 // payment using stripe
 				var partnerValues = Object.assign({}, values);
 				partnerValues['userID'] = partner._id;
 				partnerValues['email'] = partner.emails[0].address;
-				partnerValues['phone'] = partner.phone;
+				// partnerValues['phone'] = partner.phone;
 				partnerValues['addressBelongsTo'] = profile.name;
 				createOrder(raceData, partnerValues, partner, orderNum, checkout_url);
 				console.log('create order for partner');

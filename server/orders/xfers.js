@@ -162,6 +162,9 @@ Meteor.methods({
         if (partnerData) {
             partner = Meteor.users.findOne({_id: values.partner._id});
             // console.log(partner);
+            if (!partner.emails || !partner.emails[0] || !partner.emails[0].address) {
+                throw new Meteor.Error('no-email', 'Registration failed: Partner does not have email ');
+            }
             if (partner) {
                 checkOrder( partner._id, raceData );
                 console.log('Orders: check order for', race_name, 'by', partner.profile.name);
@@ -234,7 +237,7 @@ Meteor.methods({
                         var partnerValues = Object.assign({}, values);
                         partnerValues['userID'] = partner._id;
                         partnerValues['email'] = partner.emails[0].address;
-                        partnerValues['phone'] = partner.phone;
+                        // partnerValues['phone'] = partner.phone;
                         partnerValues['addressBelongsTo'] = userData._id;
                         createOrder(raceData, partnerValues, partner, orderNum, checkout_url);
                         console.log('create order for partner');
