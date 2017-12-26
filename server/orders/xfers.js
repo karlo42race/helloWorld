@@ -148,11 +148,29 @@ Meteor.methods({
         // let { address, address2, unit_number, country, postal } = values;
         // let addressDetails = `${address} ${address2} ${unit_number} ${country} ${postal}`;
         const orderNum = getOrderNumber();
-        let { priceInCents, email, phone, currency, addonArray, country } = values;
+        let { priceInCents, email, phone, currency, addonArray, country, version } = values;
         let { race_name } = raceData;
         let { first_name, last_name } = userData.profile;
         let desc = `Order for ${race_name} - order Id: ${orderNum}`;
         let IndoPrice = priceInCents / 100;
+
+        if (!version) {
+            throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
+        }
+        else {
+            let ver = version.replace(/\./g, "");
+            if (!ver) {
+                throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
+            }
+            let ver_num = parseInt(ver);
+            if (!ver_num || isNaN(ver_num)) {
+                throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
+            }
+            if (ver_num < 126) {
+                throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
+            }
+
+        }
 
         checkPrice(values, race_name); // check if price is correct
         let partnerData = values.partner;
@@ -169,7 +187,7 @@ Meteor.methods({
                 checkOrder( partner._id, raceData );
                 console.log('Orders: check order for', race_name, 'by', partner.profile.name);
                 values['runner'] = 2;
-                IndoPrice = IndoPrice * 2;
+                // IndoPrice = IndoPrice * 2;
             }
         }
         // check email exists
@@ -238,6 +256,7 @@ Meteor.methods({
                         partnerValues['userID'] = partner._id;
                         partnerValues['email'] = partner.emails[0].address;
                         // partnerValues['phone'] = partner.phone;
+                        partnerValues['price'] = 0;
                         partnerValues['addressBelongsTo'] = userData._id;
                         createOrder(raceData, partnerValues, partner, orderNum, checkout_url);
                         console.log('create order for partner');

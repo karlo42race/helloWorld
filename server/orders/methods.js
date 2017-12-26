@@ -30,12 +30,29 @@ Meteor.methods({	 // payment using stripe
 		console.log(loggingData);
 				
 		let { race_name } = raceData;
-		let { email, priceInCents, currency, addonArray, country, unit_number } = values;
+		let { email, priceInCents, currency, addonArray, country, unit_number, version } = values;
 		let { publicID, profile } = currentUser;
 		let userId = this.userId;
 		let partner;
 		let partnerData = values.partner; 
 		console.log(partnerData);
+		if (!version) {
+			throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
+		}
+		else {
+			let ver = version.replace(/\./g, "");
+			if (!ver) {
+				throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
+			}
+			let ver_num = parseInt(ver);
+			if (!ver_num || isNaN(ver_num)) {
+				throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
+			}
+			if (ver_num < 126) {
+				throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
+			}
+
+		}
 		if (raceData.no_of_runners > 1 && !partnerData){
             throw new Meteor.Error('v1.2.5', 'Registration failed. Please update to the latest app version to join this race.')
         }
@@ -81,10 +98,10 @@ Meteor.methods({	 // payment using stripe
 
 		let orderTimestamp = formatDate(new Date());		
     let orderNum = getOrderNumber(); // get order number 
-	if (partnerData) {
-		priceInCents = priceInCents*2;
-		console.log(priceInCents);
-	}
+	// if (partnerData) {
+	// 	priceInCents = priceInCents*2;
+	// 	console.log(priceInCents);
+	// }
     return createChargeOnStripe({
       source: token.id,
       amount: priceInCents, // this is equivalent to $9.90
@@ -144,6 +161,7 @@ Meteor.methods({	 // payment using stripe
 				partnerValues['userID'] = partner._id;
 				partnerValues['email'] = partner.emails[0].address;
 				// partnerValues['phone'] = partner.phone;
+				partnerValues['price'] = 0;
 				partnerValues['addressBelongsTo'] = profile.name;
 				createOrder(raceData, partnerValues, partner, orderNum, checkout_url);
 				console.log('create order for partner');
