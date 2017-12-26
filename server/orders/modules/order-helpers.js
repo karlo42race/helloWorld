@@ -60,7 +60,7 @@ const checkOrder = ( userID, raceData ) => {
 
 // check if total price is correct
 const checkPrice = ( values, race_name ) => {	
-	let { country, addonArray, price, priceInCents, promoCode } = values;
+	let { country, addonArray, price, priceInCents, promoCode, partner} = values;
 	let subTotal = 0;
 	let total;
 	let discount = 0;
@@ -82,6 +82,9 @@ const checkPrice = ( values, race_name ) => {
 	let oneCountry = getCountriesOptions.find(x => x.country === country);
 	let { convertFromOneSGD, currency, deliveryFee, racePriceInCurrency } = oneCountry;
 	
+	if (partner) {
+		racePriceInCurrency = racePriceInCurrency * 2;
+	}
 	if(promoCode) {
 		let oneCoupon = Coupons.findOne({coupon_code: promoCode});
 		if(oneCoupon) {
