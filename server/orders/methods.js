@@ -45,6 +45,7 @@ Meteor.methods({	 // payment using stripe
 				throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
 			}
 			let ver_num = parseInt(ver);
+			console.log('ios version: ', ver_num);
 			if (!ver_num || isNaN(ver_num)) {
 				throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
 			}
