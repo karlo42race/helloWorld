@@ -155,19 +155,19 @@ Meteor.methods({
         let IndoPrice = priceInCents / 100;
 
         if (!version) {
-            throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
+            throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
         }
         else {
             let ver = version.replace(/\./g, "");
             if (!ver) {
-                throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
+                throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
             }
             let ver_num = parseInt(ver);
             if (!ver_num || isNaN(ver_num)) {
-                throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
+                throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
             }
-            if (ver_num < 126) {
-                throw new Meteor.Error('v1.2.6', 'Registration failed. Please update to the latest app version to join this race.')
+            if (ver_num < 127) {
+                throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
             }
 
         }
@@ -175,7 +175,7 @@ Meteor.methods({
         checkPrice(values, race_name); // check if price is correct
         let partnerData = values.partner;
         if (raceData.no_of_runners > 1 && !partnerData){
-            throw new Meteor.Error('v1.2.5', 'Registration failed. Please update to the latest app version to join this race.')
+            throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
         }
         if (partnerData) {
             partner = Meteor.users.findOne({_id: values.partner._id});
