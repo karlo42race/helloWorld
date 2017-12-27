@@ -26,6 +26,36 @@ Meteor.methods({
     };
   },
 
+  'users.androidLoginWithFacebook'(token) {
+  	console.log(`Logging: users.androidLoginWithFacebook, token: ${token}`);
+  	
+  	try {
+      const result = HTTP.call('GET', 'https://graph.facebook.com/v2.5/me?fields=id,name,email,picture&access_token=' + token);
+      email = result['data']['email'];
+      user = Accounts.findUserByEmail(email);
+      if (user != null) {
+        userId = user['_id'];
+        var stampedLoginToken = Accounts._generateStampedLoginToken();
+        Meteor.users.update({
+            _id: userId
+        }, {
+            $push: {
+                "services.resume.loginTokens": stampedLoginToken
+            }
+        });
+        // Accounts._insertLoginToken(userId, stampedLoginToken);
+        return stampedLoginToken;// Login with the stamped loginToken's token
+      } else {
+        console.log(result);
+        return result;
+      };
+    } 
+    catch (e) {
+      console.log(e);
+      return false;
+    };
+  },
+
 	// for public user profile
 	'users.getPublicUserData'(publicID) {		
 		let user_publicID = parseInt(publicID);
