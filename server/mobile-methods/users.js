@@ -36,6 +36,7 @@ Meteor.methods({
       if (user != null) {
         userId = user['_id'];
         var stampedLoginToken = Accounts._generateStampedLoginToken();
+        Accounts._insertLoginToken(userId, stampedLoginToken);
         Meteor.users.update({
             _id: userId
         }, {
@@ -43,7 +44,6 @@ Meteor.methods({
                 "services.resume.loginTokens": stampedLoginToken
             }
         });
-        // Accounts._insertLoginToken(userId, stampedLoginToken);
         return stampedLoginToken;// Login with the stamped loginToken's token
       } else {
         console.log(result);
