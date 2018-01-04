@@ -30,15 +30,39 @@ Meteor.methods({	 // payment using stripe
 		console.log(loggingData);
 				
 		let { race_name } = raceData;
-		let { email, priceInCents, currency, addonArray, country, unit_number } = values;
+		let { email, priceInCents, currency, addonArray, country, unit_number, version } = values;
 		let { publicID, profile } = currentUser;
 		let userId = this.userId;
 		let partner;
 		let partnerData = values.partner; 
 		console.log(partnerData);
+		if (!version) {
+            throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
+		}
+		else {
+			let ver = version.replace(/\./g, "");
+			if (!ver) {
+            	throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
+			}
+			let ver_num = parseInt(ver);
+			console.log('ios version: ', ver_num);
+			if (!ver_num || isNaN(ver_num)) {
+				throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
+			}
+			if (ver_num < 127) {
+				throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
+			}
+
+		}
+		if (raceData.no_of_runners > 1 && !partnerData){
+            throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
+        }
 		if (partnerData) {
 			partner = Meteor.users.findOne({_id: values.partner._id});
 			// console.log(partner);
+			if (!partner.emails || !partner.emails[0] || !partner.emails[0].address) {
+				throw new Meteor.Error('no-email', 'Registration failed: Partner does not have email ');
+            }
 		}
 
 		console.log('Orders: charging card for race: ', race_name, 'for user: ', email);
@@ -75,10 +99,10 @@ Meteor.methods({	 // payment using stripe
 
 		let orderTimestamp = formatDate(new Date());		
     let orderNum = getOrderNumber(); // get order number 
-	if (partnerData) {
-		priceInCents = priceInCents*2;
-		console.log(priceInCents);
-	}
+	// if (partnerData) {
+	// 	priceInCents = priceInCents*2;
+	// 	console.log(priceInCents);
+	// }
     return createChargeOnStripe({
       source: token.id,
       amount: priceInCents, // this is equivalent to $9.90
@@ -137,7 +161,8 @@ Meteor.methods({	 // payment using stripe
 				var partnerValues = Object.assign({}, values);
 				partnerValues['userID'] = partner._id;
 				partnerValues['email'] = partner.emails[0].address;
-				partnerValues['phone'] = partner.phone;
+				// partnerValues['phone'] = partner.phone;
+				partnerValues['price'] = 0;
 				partnerValues['addressBelongsTo'] = profile.name;
 				createOrder(raceData, partnerValues, partner, orderNum, checkout_url);
 				console.log('create order for partner');

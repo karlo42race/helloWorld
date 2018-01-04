@@ -149,22 +149,46 @@ Meteor.methods({
         // let { address, address2, unit_number, country, postal } = values;
         // let addressDetails = `${address} ${address2} ${unit_number} ${country} ${postal}`;
         const orderNum = getOrderNumber();
-        let { priceInCents, email, phone, currency, addonArray, country } = values;
+        let { priceInCents, email, phone, currency, addonArray, country, version } = values;
         let { race_name } = raceData;
         let { first_name, last_name } = userData.profile;
         let desc = `Order for ${race_name} - order Id: ${orderNum}`;
         let IndoPrice = priceInCents / 100;
 
+        if (!version) {
+            throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
+        }
+        else {
+            let ver = version.replace(/\./g, "");
+            if (!ver) {
+                throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
+            }
+            let ver_num = parseInt(ver);
+            if (!ver_num || isNaN(ver_num)) {
+                throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
+            }
+            if (ver_num < 127) {
+                throw new Meteor.Error('v1.2.7', 'Registration failed. New iOS version will be available on 28th Dec, please register on web for now')
+            }
+
+        }
+
         checkPrice(values, race_name); // check if price is correct
         let partnerData = values.partner;
+        if (raceData.no_of_runners > 1 && !partnerData){
+            throw new Meteor.Error('v1.2.5', 'Registration failed. Please update to the latest app version to join this race.')
+        }
         if (partnerData) {
             partner = Meteor.users.findOne({_id: values.partner._id});
             // console.log(partner);
+            if (!partner.emails || !partner.emails[0] || !partner.emails[0].address) {
+                throw new Meteor.Error('no-email', 'Registration failed: Partner does not have email ');
+            }
             if (partner) {
                 checkOrder( partner._id, raceData );
                 console.log('Orders: check order for', race_name, 'by', partner.profile.name);
                 values['runner'] = 2;
-                IndoPrice = IndoPrice * 2;
+                // IndoPrice = IndoPrice * 2;
             }
         }
         // check email exists
@@ -232,7 +256,8 @@ Meteor.methods({
                         var partnerValues = Object.assign({}, values);
                         partnerValues['userID'] = partner._id;
                         partnerValues['email'] = partner.emails[0].address;
-                        partnerValues['phone'] = partner.phone;
+                        // partnerValues['phone'] = partner.phone;
+                        partnerValues['price'] = 0;
                         partnerValues['addressBelongsTo'] = userData._id;
                         createOrder(raceData, partnerValues, partner, orderNum, checkout_url);
                         console.log('create order for partner');

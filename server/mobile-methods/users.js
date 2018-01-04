@@ -7,7 +7,7 @@ Meteor.methods({
   	console.log(`Logging: users.appLoginWithFacebook, token: ${token}`);
   	
   	try {
-      const result = HTTP.call('GET', 'https://graph.facebook.com/v2.3/me?fields=id,name,email,picture&access_token=' + token);
+      const result = HTTP.call('GET', 'https://graph.facebook.com/v2.5/me?fields=id,name,email,picture&access_token=' + token);
       email = result['data']['email'];
       user = Accounts.findUserByEmail(email);
       if (user != null) {
