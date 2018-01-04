@@ -128,6 +128,7 @@ const sendEmailWithOrderId = (orderId) => {
 Meteor.methods({
     'xfers.charge'(raceData, values, userData) {
         this.unblock();
+        throw new Meteor.Error('', 'Error: Bank transfer is currently unavailable due to restrictions with Xfers');
         let partner;
         let loggingData = {
             raceData: raceData,
