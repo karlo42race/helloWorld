@@ -1,5 +1,5 @@
 import { check, Match } from 'meteor/check';
-import { AllResults, Following, Notifications, UserMeta, VirtualRaces } from '/imports/api/collections.js';
+import { AllResults, Following, Notifications, UserMeta, VirtualRaces, Submissions } from '/imports/api/collections.js';
 
 Meteor.methods({
 	// for client mobile app login via facebook method
@@ -54,7 +54,6 @@ Meteor.methods({
     
   	return data;
 	},
-	
 	// for user profile page
 	'users.getOwnUserData'() {
 		let oneUserFields = {
@@ -63,7 +62,9 @@ Meteor.methods({
 			'motto': 1, 
 			'publicID': 1,
 			'message': 1,
-			'roles': 1
+			'roles': 1,
+			'bannerImg': 1,
+			'address.country': 1,
 		}
 		let oneUserMeta = UserMeta.findOne({ userID: this.userId }, {fields: {} });
 		let { total_distance, total_timing, submissions_count } = oneUserMeta;
@@ -74,37 +75,61 @@ Meteor.methods({
 		let data = oneUser;				
 		
 		// get badges url
-		let results = AllResults.find({userID: this.userId}).fetch();
-		let badges = [];
+		// let results = AllResults.find({userID: this.userId}).fetch();
+		// let badges = [];
 
-		_.each(results, (c) => {
-			let { race_type, distance, category, raceID, _id } = c;
-			if(race_type == 'virtual_race') {
-				if(distance >= category) {
-					// deprecate after badges change
-					let oneRace = VirtualRaces.findOne({_id: raceID});					
-					let badge = oneRace ? oneRace.badge_color : "";
-					badges.push(badge);
-				};
-			} else if (race_type == 'challenge') {
-				if(distance >= 20) {
-					// deprecate after badges change
-					let oneRace = VirtualRaces.findOne({_id: raceID});
-					let badge = oneRace ? oneRace.badge_color : "";					
-					badges.push(badge);
-				};
-			};						
-		});	
+		// _.each(results, (c) => {
+		// 	let { race_type, distance, category, raceID, _id } = c;
+		// 	if(race_type == 'virtual_race') {
+		// 		if(distance >= category) {
+		// 			// deprecate after badges change
+		// 			let oneRace = VirtualRaces.findOne({_id: raceID});
+		// 			let badge = oneRace ? oneRace.badge_color : "";
+		// 			badges.push(badge);
+		// 		};
+		// 	} else if (race_type == 'challenge') {
+		// 		if(distance >= 20) {
+		// 			// deprecate after badges change
+		// 			let oneRace = VirtualRaces.findOne({_id: raceID});
+		// 			let badge = oneRace ? oneRace.badge_color : "";
+		// 			badges.push(badge);
+		// 		};
+		// 	};
+		// });
+        let today = new Date();
+        let currentRaces = VirtualRaces.find({end_date: { $gte: today }});
 
-		Object.assign(data, {
-    	fansCount,
-    	idolCount,
-    	total_distance,
+        let currentRacesFetched = currentRaces.fetch();
+        let racesArr = [];
+        _.each(currentRacesFetched, (race) => {
+            racesArr.push(race.race_name);
+        });
+        let virtualRaces = [];
+        let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
+        if (allResults.length<2){
+			virtualRaces = currentRacesFetched;
+            virtualRaces = virtualRaces.splice(0, (2 - allResults.length));
+        }else{
+            allResults = allResults.slice(0,2);
+		}
+        let options = {
+            limit: 10,
+            sort: {createdAt: -1},
+        };
+		let submissions = Submissions.find({}, options).fetch();
+        Object.assign(data, {
+			fansCount,
+			idolCount,
+			total_distance,
 			total_timing,
 			submissions_count,
-			badges			
-    });
+			allResults,
+			virtualRaces,
+			submissions,
 
+
+
+    });
     return data;
 
 	},
