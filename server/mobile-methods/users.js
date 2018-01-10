@@ -75,27 +75,27 @@ Meteor.methods({
 		let data = oneUser;				
 		
 		// get badges url
-		// let results = AllResults.find({userID: this.userId}).fetch();
-		// let badges = [];
+		let results = AllResults.find({userID: this.userId}).fetch();
+		let badges = [];
 
-		// _.each(results, (c) => {
-		// 	let { race_type, distance, category, raceID, _id } = c;
-		// 	if(race_type == 'virtual_race') {
-		// 		if(distance >= category) {
-		// 			// deprecate after badges change
-		// 			let oneRace = VirtualRaces.findOne({_id: raceID});
-		// 			let badge = oneRace ? oneRace.badge_color : "";
-		// 			badges.push(badge);
-		// 		};
-		// 	} else if (race_type == 'challenge') {
-		// 		if(distance >= 20) {
-		// 			// deprecate after badges change
-		// 			let oneRace = VirtualRaces.findOne({_id: raceID});
-		// 			let badge = oneRace ? oneRace.badge_color : "";
-		// 			badges.push(badge);
-		// 		};
-		// 	};
-		// });
+		_.each(results, (c) => {
+			let { race_type, distance, category, raceID, _id } = c;
+			if(race_type == 'virtual_race') {
+				if(distance >= category) {
+					// deprecate after badges change
+					let oneRace = VirtualRaces.findOne({_id: raceID});
+					let badge = oneRace ? oneRace.badge_color : "";
+					badges.push(badge);
+				};
+			} else if (race_type == 'challenge') {
+				if(distance >= 20) {
+					// deprecate after badges change
+					let oneRace = VirtualRaces.findOne({_id: raceID});
+					let badge = oneRace ? oneRace.badge_color : "";
+					badges.push(badge);
+				};
+			};
+		});
         let today = new Date();
         let currentRaces = VirtualRaces.find({end_date: { $gte: today }});
 
@@ -126,8 +126,7 @@ Meteor.methods({
 			allResults,
 			virtualRaces,
 			submissions,
-
-
+            badges
 
     });
     return data;
