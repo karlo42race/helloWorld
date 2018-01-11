@@ -97,7 +97,7 @@ Meteor.methods({
 			};
 		});
         let today = new Date();
-        let currentRaces = VirtualRaces.find({end_date: { $gte: today }});
+        let currentRaces = VirtualRaces.find({end_date: { $gte: today }},  {sort: {end_date: -1} });
 
         let currentRacesFetched = currentRaces.fetch();
         let racesArr = [];
