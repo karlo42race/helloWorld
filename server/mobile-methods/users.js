@@ -106,6 +106,11 @@ Meteor.methods({
         });
         let virtualRaces = [];
         let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
+		_.each(allResults, (results, index)=>{
+			let oneRace = VirtualRaces.findOne({_id: results.raceID});
+			allResults[index]['badge_grey'] = oneRace.badge_grey;
+			allResults[index]['badge_color'] = oneRace.badge_color;
+		});
         if (allResults.length<2){
 			virtualRaces = currentRacesFetched;
             virtualRaces = virtualRaces.splice(0, (2 - allResults.length));
