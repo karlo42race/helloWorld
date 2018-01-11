@@ -21,6 +21,18 @@ Meteor.methods({
 		})
 		console.log('Users: udating user profile picture for: ', this.userId, 'complete'); 
 	},
+    'users.updateProfileBanner'(url) {
+        console.log(`Logging: users.updateProfileBanner, url: ${url}`);
+
+        Meteor.users.update({
+            _id: this.userId
+        }, {
+            $set: {
+                bannerImg: url
+            }
+        })
+        console.log('Users: updating user banner image for: ', this.userId, 'complete');
+    },
 
 	// update user profile
 	'users.updateDetails'(value) {
