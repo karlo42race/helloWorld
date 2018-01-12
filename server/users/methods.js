@@ -67,7 +67,7 @@ Meteor.methods({
 					name,
 					first_name,
 					last_name,
-					nric: '',
+					nric,
 					gender,
 				},
 				motto,
