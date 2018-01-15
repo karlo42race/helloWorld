@@ -87,7 +87,17 @@ Meteor.methods({
 		return data;
 
 	},
+	'virtualRaces.currentVirtualRaces'(){
+        return VirtualRaces.find({ end_date: {$gte: new Date()} }, {sort: {start_date: -1} })
+    },
+	'virtualRaces.pastVirtualRaces'(){
+        let options = {
+            limit: limit,
+            sort: {start_date: -1},
+        };
+        return VirtualRaces.find({ end_date: {$lt: new Date()} }, options)
+	}
 
-})
+});
 
 
