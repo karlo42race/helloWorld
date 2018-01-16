@@ -90,7 +90,7 @@ Meteor.methods({
 	'virtualRaces.currentVirtualRaces'(){
         return VirtualRaces.find({ end_date: {$gte: new Date()} }, {sort: {start_date: -1} }).fetch()
     },
-	'virtualRaces.pastVirtualRaces'(){
+	'virtualRaces.pastVirtualRaces'(limit){
         let options = {
             limit: limit,
             sort: {start_date: -1},
