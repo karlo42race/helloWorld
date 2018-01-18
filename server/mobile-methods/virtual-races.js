@@ -96,7 +96,58 @@ Meteor.methods({
             sort: {start_date: -1},
         };
         return VirtualRaces.find({ end_date: {$lt: new Date()} }, options).fetch()
-	}
+	},
+	'virtualRaces.runnerForRace'(raceID){
+        let orders = _.uniq(Orders.find({raceID: raceID}, {
+            fields: {userID: 1}
+        }).fetch().map(function(x) {
+            return x.userID;
+        }), true);
+        let fields = {
+            'profile.name': 1,
+            'profilePic': 1,
+            'publicID': 1
+        };
+        return Meteor.users.find({_id: {$in: orders} }, { fields: fields } );
+	},
+    'virtualRaces.getRaceData'(raceType){
+        let virtualRaceCondition;
+        let today = new Date();
+        if (raceType === 'current'){
+            virtualRaceCondition = { end_date: {$gte: today }};
+        }
+        else if (raceType ==='past'){
+            virtualRaceCondition = { end_date: {$lt: today }};
+        }
+        else{
+            return false;
+        }
+        let raceData = [];
+        let races = VirtualRaces.find(virtualRaceCondition,  {sort: {end_date: -1} });
+        let racesFetched = races.fetch();
+        let racesArr = [];
+        let allResultVirtualRace = {};
+        _.each(racesFetched, (race) => {
+            racesArr.push(race.race_name);
+            allResultVirtualRace[race.race_name] = race;
+        });
+        let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
+        _.each(allResults, (results, index)=>{
+            let oneRace = allResultVirtualRace[results.race];
+            delete allResultVirtualRace[results.race];
+            allResults[index]['badge_grey'] = oneRace.badge_grey;
+            allResults[index]['badge_color'] = oneRace.badge_color;
+            allResults[index]['end_date'] = oneRace.end_date;
+        });
+        _.each(allResultVirtualRace, (race)=>{
+            raceData.push(race)
+        });
+        raceData =  [...raceData, ...allResults];
+        raceData.sort(function(a,b){
+            return b.end_date - a.end_date;
+        });
+        return raceData;
+    }
 
 });
 
