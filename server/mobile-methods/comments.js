@@ -1,5 +1,5 @@
 import { check, Match } from 'meteor/check';
-import { Comments, Submissions } from '/imports/api/collections.js';
+import { Comments, Submissions, Following } from '/imports/api/collections.js';
 
 Meteor.methods({
 	// get comments for one submission
@@ -31,5 +31,29 @@ Meteor.methods({
 		
 		return data;
 	},
-	
+    'comments.getLikeList'(postID){
+        let submissions = Submissions.findOne({_id: postID});
+        let cheers = submissions.cheers;
+        let fields = {
+            'profile.name': 1,
+            'profilePic': 1,
+            'publicID': 1
+        };
+        let users = Meteor.users.find({_id: {$in: cheers}}, {fields: fields}).fetch();
+
+        let followers = Following.find({'userID': this.userId}, {fields:{idol_userID: 1}}).fetch();
+        let followersList = [];
+        _.each(followers, (follow)=>{
+            followersList.push(follow.idol_userID);
+        });
+        console.log(followersList)
+        let likeList = {"follow": [], "following": []};
+        _.each(users, (user)=>{
+            if (followersList.indexOf(user._id)> -1)
+                likeList.following.push(user);
+            else
+                likeList.follow.push(user);
+        });
+        return likeList;
+    },
 });
