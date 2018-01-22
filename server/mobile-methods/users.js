@@ -110,6 +110,7 @@ Meteor.methods({
 			let oneRace = VirtualRaces.findOne({_id: results.raceID});
 			allResults[index]['badge_grey'] = oneRace.badge_grey;
 			allResults[index]['badge_color'] = oneRace.badge_color;
+			allResults[index]['bib_design'] = oneRace.bib_design;
 		});
         if (allResults.length<2){
 			virtualRaces = currentRacesFetched;
