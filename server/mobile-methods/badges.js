@@ -49,10 +49,13 @@ Meteor.methods({
             // If completed
             if (!isNaN(allResults.distance) && !isNaN(allResults.category) && parseInt(allResults.distance) >= parseInt(allResults.category)){
                 badgeData["img"] = virtualRace.badge_color;
+                badgeData["name"] = virtualRace.race_name;
                 badgeData["distance"] = allResults.distance;
                 badgeData["pace"] = allResults.timing_per_km;
                 badgeData["category"] = allResults.category;
                 badgeData["position"] = allResults.position;
+                badgeData["start_date"] = virtualRace.start_date;
+                badgeData["end_date"] = virtualRace.end_date;
                 let allUserResults = AllResults.findOne({race: race_name});
                 _.each(allUserResults, (results)=> {
                     if (!isNaN(results.distance) && !isNaN(results.category) && parseInt(results.distance) >= parseInt(results.category)) {
@@ -67,6 +70,7 @@ Meteor.methods({
 
                 badgeData["img"] = virtualRace.badge_grey;
                 totalCount = AllResults.find({race: race_name}).count();
+                badgeData["name"] = virtualRace.race_name;
                 badgeData["runners"] = totalCount;
                 badgeData["start_date"] = virtualRace.start_date;
                 badgeData["end_date"] = virtualRace.end_date;
@@ -75,6 +79,7 @@ Meteor.methods({
         }else{
             badgeData["img"] = virtualRace.badge_grey;
             totalCount = AllResults.find({race: race_name}).count();
+            badgeData["name"] = virtualRace.race_name;
             badgeData["runners"] = totalCount;
             badgeData["start_date"] = virtualRace.start_date;
             badgeData["end_date"] = virtualRace.end_date;
