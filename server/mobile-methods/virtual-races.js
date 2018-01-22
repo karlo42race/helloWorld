@@ -1,5 +1,5 @@
 import { check, Match } from 'meteor/check';
-import { Orders, ProductItems, Teams, VirtualRaces } from '/imports/api/collections.js';
+import { Orders, ProductItems, Teams, VirtualRaces, AllResults } from '/imports/api/collections.js';
 
 Meteor.methods({
 	'virtualRaces.getOneRace'(slug) {
