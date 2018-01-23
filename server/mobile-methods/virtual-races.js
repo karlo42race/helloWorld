@@ -140,6 +140,7 @@ Meteor.methods({
             allResults[index]['end_date'] = oneRace.end_date;
             allResults[index]['bib_design'] = oneRace.bib_design;
             allResults[index]['slug'] = oneRace.slug;
+            allResults[index]['cert_finish'] = oneRace.cert_finish;
 
 
         });
