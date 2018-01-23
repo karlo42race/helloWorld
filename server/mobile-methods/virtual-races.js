@@ -139,6 +139,8 @@ Meteor.methods({
             allResults[index]['badge_color'] = oneRace.badge_color;
             allResults[index]['end_date'] = oneRace.end_date;
             allResults[index]['bib_design'] = oneRace.bib_design;
+            allResults[index]['slug'] = oneRace.slug;
+
 
         });
         _.each(allResultVirtualRace, (race)=>{
