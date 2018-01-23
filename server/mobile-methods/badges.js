@@ -17,7 +17,7 @@ Meteor.methods({
         let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
         let results = [];
         _.each(allResults, (result) => {
-            if (!isNaN(result.distance) && !isNaN(result.category) && parseInt(result.distance) >= parseInt(results.category))
+            if (!isNaN(result.distance) && !isNaN(result.category) && parseInt(result.distance) >= parseInt(result.category))
                 results.push(result.race_name);
         });
 
@@ -54,6 +54,7 @@ Meteor.methods({
                 badgeData["pace"] = allResults.timing_per_km;
                 badgeData["category"] = allResults.category;
                 badgeData["position"] = allResults.position;
+                badgeData["type"] = "completed";
                 badgeData["start_date"] = virtualRace.start_date;
                 badgeData["end_date"] = virtualRace.end_date;
                 let allUserResults = AllResults.findOne({race: race_name});
@@ -64,8 +65,6 @@ Meteor.methods({
                 });
                 badgeData["totalBadge"] = totalCount;
             }
-            // TODO Can be merged if design is same for both joined race and race which user has not joined
-            // If Not yet completed
             else{
 
                 badgeData["img"] = virtualRace.badge_grey;
@@ -74,6 +73,7 @@ Meteor.methods({
                 badgeData["runners"] = totalCount;
                 badgeData["start_date"] = virtualRace.start_date;
                 badgeData["end_date"] = virtualRace.end_date;
+                badgeData["type"] = "incomplete";
 
             }
         }else{
@@ -83,6 +83,7 @@ Meteor.methods({
             badgeData["runners"] = totalCount;
             badgeData["start_date"] = virtualRace.start_date;
             badgeData["end_date"] = virtualRace.end_date;
+            badgeData["type"] = "join";
         }
         return badgeData;
     }
