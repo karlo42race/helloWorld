@@ -99,5 +99,10 @@ Meteor.methods({
 		let topics = FeedsTopics.find({}, options).fetch();
 		console.log(topics);
 		return topics;
-	}
-})
+	},
+	'submissions.getOneRaceSubmissions'(race){
+        let oneResult = AllResults.findOne({userID: this.userId, race: race});
+        let submissionsID = oneResult ? oneResult.submissions : [];
+        return Submissions.find({_id: {$in: submissionsID} }).fetch();
+    }
+});
