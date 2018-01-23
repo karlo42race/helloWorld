@@ -111,7 +111,11 @@ Meteor.methods({
 			allResults[index]['badge_grey'] = oneRace.badge_grey;
 			allResults[index]['badge_color'] = oneRace.badge_color;
 			allResults[index]['bib_design'] = oneRace.bib_design;
-		});
+            allResults[index]['slug'] = oneRace.slug;
+            allResults[index]['cert_finish'] = oneRace.cert_finish;
+
+
+        });
         if (allResults.length<2){
 			virtualRaces = currentRacesFetched;
             virtualRaces = virtualRaces.splice(0, (2 - allResults.length));
