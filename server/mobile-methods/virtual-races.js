@@ -1,5 +1,5 @@
 import { check, Match } from 'meteor/check';
-import { Orders, ProductItems, Teams, VirtualRaces, AllResults } from '/imports/api/collections.js';
+import { Orders, ProductItems, Teams, VirtualRaces, AllResults, Following } from '/imports/api/collections.js';
 
 Meteor.methods({
 	'virtualRaces.getOneRace'(slug) {
@@ -137,7 +137,16 @@ Meteor.methods({
             return x.userID;
         }), true);
 
-        return Meteor.users.find({_id: {$in: orders} }, options).fetch();
+        let users = Meteor.users.find({_id: {$in: orders} }, options).fetch();
+        _.each(users, (user, index)=>{
+            let follow = Following.findOne({'userID': user._id}, {fields:{idol_userID: 1}});
+            if(follow)
+            	users[index]["follow"] = "following";
+            else
+            	users[index]["follow"] = "follow";
+
+        });
+        return users;
     },
     'virtualRaces.getRaceData'(raceType){
         let virtualRaceCondition;
