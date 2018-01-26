@@ -38,7 +38,7 @@ Meteor.methods({
     	productItems,
     	orderCount,
     	order: oneOrder,
-		runners: Meteor.users.find({_id: {$in: orderUsers} }, { fields: fields } ).fetch()
+		runners: Meteor.users.find({_id: {$in: orderUsers} }, { fields: fields, limit: 10 } ).fetch()
     });
 
     return data;
@@ -119,6 +119,26 @@ Meteor.methods({
         };
         return Meteor.users.find({_id: {$in: orders} }, { fields: fields } );
 	},
+    'virtualRaces.runnerForRaceWithSkipCount'(raceID, skipCount) {
+        let fields = {
+            'profile.name': 1,
+            'profilePic': 1,
+            'publicID': 1
+        };
+		let options = {
+            limit: 10,
+            skip: skipCount,
+            sort: {createdAt: -1},
+			fields: fields
+        };
+        let orders = _.uniq(Orders.find({raceID: raceID}, {
+            fields: {userID: 1}
+        }).fetch().map(function(x) {
+            return x.userID;
+        }), true);
+
+        return Meteor.users.find({_id: {$in: orders} }, options).fetch();
+    },
     'virtualRaces.getRaceData'(raceType){
         let virtualRaceCondition;
         let today = new Date();
