@@ -357,6 +357,15 @@ Meteor.methods({
 		data = Meteor.users.find({_id: {$in: userIDs}}, {fields: {'profile.name': 1, 'profilePic': 1, 'publicID': 1}}).fetch()  	
 	  
 	  return data;
-	},	
+	},
+    'users.updateLanguage'(lang){
+        Meteor.users.update({
+            _id: this.userId
+        }, {
+            $set: {
+                lang: lang
+            }
+        })
+    }
 	
 });

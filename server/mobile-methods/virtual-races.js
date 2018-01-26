@@ -18,18 +18,27 @@ Meteor.methods({
 				{status: {$ne: 'cancelled'} }
 			] 
 		}, { fields: {'orderNum': 1, 'status': 1, createdAt: 1 } });
-		
-		let orderCount = Orders.find({'race': race, 'status': 'paid'}).count();
+		let orders = Orders.find({'race': race, 'status': 'paid'}, {fields:{userID:1}});
+		let orderCount = orders.count();
 		let productItems = ProductItems.find({$or: [{race: race}, {race: 'all'}] }).fetch();
 		let teams = Teams.find({raceID: raceID}, {limit: 10, sort: {position: 1} } ).fetch();
 
 		let data = oneRace;
 
+        let orderUsers = _.uniq(orders.fetch().map(function(x) {
+            return x.userID;
+        }), true);
+        let fields = {
+            'profile.name': 1,
+            'profilePic': 1,
+            'publicID': 1
+        };
 		Object.assign(data, {
     	teams,
     	productItems,
     	orderCount,
-    	order: oneOrder    	
+    	order: oneOrder,
+		runners: Meteor.users.find({_id: {$in: orderUsers} }, { fields: fields } )
     });
 
     return data;
