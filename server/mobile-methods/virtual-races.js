@@ -38,7 +38,7 @@ Meteor.methods({
     	productItems,
     	orderCount,
     	order: oneOrder,
-		runners: Meteor.users.find({_id: {$in: orderUsers} }, { fields: fields } )
+		runners: Meteor.users.find({_id: {$in: orderUsers} }, { fields: fields } ).fetch()
     });
 
     return data;
