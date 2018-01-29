@@ -28,8 +28,10 @@ class TestPage extends Component {
 	}
 
 	getData() {
-		let page = currentPage.get();
+		// let page = currentPage.get();
 		
+		let method = "virtualRaces.getOneRace",
+		 		field1 = 'hellweekcheetah'
 		// let method = "users.getFollowers",
 		// 		field1 = 11000,
 		// 		field2 = 10,
@@ -44,13 +46,13 @@ class TestPage extends Component {
 		// 		field3 = {email:"email@email.com", priceInCents:10, currency:"SGD", addonArray:[], country:"Singapura", unit_number:"-0"},
 		// 		field4 = 9.90		
 		
-		let method = "dashboardResults",
-				field1 = 'current',
-				field2 = 0,
-				field3 = 10
+		// let method = "dashboardResults",
+		// 		field1 = 'current',
+		// 		field2 = 0,
+		// 		field3 = 10
 		if(Roles.userIsInRole(Meteor.user(), ['superadmin', 'admin']) ) {
 
-			Meteor.call(method, field1, field2, field3, (err, res) => {
+			Meteor.call(method, field1, (err, res) => {
 				if(err) {
 					console.log(err.reason);
 					alert(err.reason)
@@ -61,7 +63,7 @@ class TestPage extends Component {
 			});
 
 		} else {
-			Meteor.call(method, field1, field2, field3, (err, res) => {
+			Meteor.call(method, field1, (err, res) => {
 				if(err) {
 					console.log(err.reason);
 					alert(err.reason)
