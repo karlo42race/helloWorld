@@ -7,7 +7,7 @@ Meteor.methods({
 
 		let oneRace = VirtualRaces.findOne({slug: slug}, { fields: {'team': 0} });
 		if (!oneRace.free_race) {
-		    oneRace['free_race'] = 'N';
+		    oneRace['free_race'] = "N";
         }
 		let race, raceID;
 		if(oneRace) {
