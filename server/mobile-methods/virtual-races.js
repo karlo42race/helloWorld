@@ -142,7 +142,7 @@ Meteor.methods({
 
         let users = Meteor.users.find({_id: {$in: orders} }, options).fetch();
         _.each(users, (user, index)=>{
-            let follow = Following.findOne({'userID': user._id}, {fields:{idol_userID: 1}});
+            let follow = Following.findOne({'userID': this.userID, 'idol_userID': user._id}, {fields:{idol_userID: 1}});
             if(follow)
             	users[index]["follow"] = "following";
             else
