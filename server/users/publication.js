@@ -57,7 +57,7 @@ Meteor.publish('searchUsers', function(limit, value) {
 					  			{ 'emails.address': filter }, 
 					  			{ 'profile.name': filter }, 
 					  			{ 'publicID': filterInt } 
-								]}
+								]};
   var options = {
 		limit,		
 		sort: {'profile.name': -1},
