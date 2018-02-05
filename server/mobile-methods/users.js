@@ -366,6 +366,40 @@ Meteor.methods({
                 lang: lang
             }
         })
-    }
+	},
+	'users.getDashboardData'(){
+		let racesArr = [];
+		let currentRaces = {};
+		let badgesData = [];
+		let registeredApps = [];
+		let racesFetched = VirtualRaces.find({ end_date: {$gte: new Date()} }, {sort: {start_date: -1} }).fetch();		
+		_.each(racesFetched, (race) => {
+            racesArr.push(race.race_name);
+            currentRaces[race.race_name] = race;
+		});
+		let joinedRaces = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
+		_.each(joinedRaces, (results, index)=>{
+			let oneRace = currentRaces[results.race];
+			
+            delete currentRaces[results.race];
+            joinedRaces[index]['badge_grey'] = oneRace.badge_grey;
+            joinedRaces[index]['badge_color'] = oneRace.badge_color;
+            joinedRaces[index]['end_date'] = oneRace.end_date;
+		});
+		let allResults = AllResults.find({bib_number: Meteor.user().publicID}).fetch();
+		_.each(allResults, (result)=>{
+			if (!isNaN(result.distance) && !isNaN(result.category) && parseInt(result.distance) >= parseInt(result.category)){
+				badgesData.push(result.raceID);
+			}
+		})
+		let user = UserMeta.findOne({userID: Meteor.user()._id});
+		if (user)
+			registeredApps = user.registered_apps
+		let currentRacesArr = [];
+		_.forEach(currentRaces, (value, key)=>{
+			currentRacesArr.push(value);
+		});
+		return {"currentRaces": currentRacesArr, "joinedRaces": joinedRaces, "badges": VirtualRaces.find({_id: {$in: badgesData}}).fetch(), "registeredApps": registeredApps}
+	}
 	
 });
