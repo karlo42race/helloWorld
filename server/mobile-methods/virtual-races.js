@@ -22,7 +22,7 @@ Meteor.methods({
 			] 
 		}, { fields: {'orderNum': 1, 'status': 1, createdAt: 1 } });
 		let orders = Orders.find({'race': race, 'status': 'paid'}, {fields:{userID:1}});
-		let orderCount = AllResults.find({raceID: raceID}, {fields: {userID: 1}}).count();
+		let orderCount = Orders.find({raceID: raceID}, {fields: {userID: 1}}).count();
 		let productItems = ProductItems.find({$or: [{race: race}, {race: 'all'}] }).fetch();
 		let teams = Teams.find({raceID: raceID}, {limit: 10, sort: {position: 1} } ).fetch();
 
@@ -129,16 +129,17 @@ Meteor.methods({
             'publicID': 1
         };
 		let options = {
-            limit: 10,
             skip: skipCount,
+            limit: 10,
             sort: {createdAt: -1},
 			fields: fields
         };
-        let orders = _.uniq(AllResults.find({raceID: raceID}, {
+        let orders = _.uniq(Orders.find({raceID: raceID}, {
             fields: {userID: 1}
         }).fetch().map(function(x) {
             return x.userID;
         }), true);
+        orders = [].concat.apply([], orders);
         let users = Meteor.users.find({_id: {$in: orders} }, options).fetch();
         _.each(users, (user, index)=>{
             let follow = Following.findOne({'userID': Meteor.user()._id, 'idol_userID': user._id}, {fields:{idol_userID: 1}});
