@@ -448,8 +448,10 @@ Meteor.methods({	 // payment using stripe
   	};  	
   	
   },
-
-
-
+	'orders.checkPrice'(values, raceData) {
+		let { race_name } = raceData;
+		checkPrice(values, race_name); // check if price is correct
+		return true;
+	},
 
 })
