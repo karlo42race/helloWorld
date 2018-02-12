@@ -99,14 +99,14 @@ Meteor.methods({
 
 	},
 	'virtualRaces.currentVirtualRaces'(){
-        return VirtualRaces.find({ end_date: {$gte: new Date()} }, {sort: {start_date: -1} }).fetch()
+        return VirtualRaces.find({ end_date: {$gte: new Date()}, hide_banner_on_dashboard:"show" }, {sort: {start_date: -1} }).fetch()
     },
 	'virtualRaces.pastVirtualRaces'(){
         let options = {
             limit: limit,
             sort: {start_date: -1},
         };
-        return VirtualRaces.find({ end_date: {$lt: new Date()} }, options).fetch()
+        return VirtualRaces.find({ end_date: {$lt: new Date()}, hide_banner_on_dashboard:"show" }, options).fetch()
 	},
 	'virtualRaces.runnerForRace'(raceID){
         let orders = _.uniq(AllResults.find({raceID: raceID}, {
