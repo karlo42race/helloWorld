@@ -154,10 +154,10 @@ Meteor.methods({
         let virtualRaceCondition;
         let today = new Date();
         if (raceType === 'current'){
-            virtualRaceCondition = { end_date: {$gte: today }};
+            virtualRaceCondition = { end_date: {$gte: today}, hide_banner_on_dashboard:"show"};
         }
         else if (raceType ==='past'){
-            virtualRaceCondition = { end_date: {$lt: today }};
+            virtualRaceCondition = { end_date: {$lt: today }, hide_banner_on_dashboard:"show"};
         }
         else{
             return false;
