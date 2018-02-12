@@ -6,29 +6,46 @@ import {VirtualRaces, AllResults} from '/imports/api/collections.js';
 
 Meteor.methods({
     'badges.getBadges'(badgeType){
-        let races = VirtualRaces.find({race_type: badgeType},  {sort: {end_date: -1} });
+        let condition = {};
+        if (badgeType != 'all')
+            condition = {race_type: badgeType}
+        let races = VirtualRaces.find(condition,  {sort: {end_date: 1} });
         let racesFetched = races.fetch();
         let racesArr = [];
         let badgesData = {};
+        let raceCategoryMapping = {};
         _.each(racesFetched, (race) => {
             racesArr.push(race.race_name);
-
         });
         let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
-        let results = [];
+        let completedResults = [], joinedResults = [];
         _.each(allResults, (result) => {
-            if (!isNaN(result.distance) && !isNaN(result.category) && parseInt(result.distance) >= parseInt(result.category))
-                results.push(result.race_name);
-        });
-
-        _.each(racesFetched, (race) => {
-            let race_data = {'name': race.race_name};
-            if (results.indexOf(race.race_name)> -1){
-                race_data['img'] = race.badge_color;
-            }else{
-                race_data['img'] = race.badge_grey;
+            if (!isNaN(result.distance) && !isNaN(result.category) && parseInt(result.distance) >= parseInt(result.category)){
+                completedResults.push(result.race);
+                raceCategoryMapping[result.race] = result.category;
             }
-            if (typeof race.end_date=="object"){
+            else
+                joinedResults.push(result.race)
+        });
+        _.each(racesFetched, (race) => {
+            let race_data = {'name': race.race_name, 'type': race.race_type};
+
+            if (completedResults.indexOf(race.race_name)> -1 ){
+                race_data['img'] = race.badge_color;
+                race_data['subText'] = raceCategoryMapping[race.race_name]+ "KM Finisher";
+                race_data['completed'] = true;
+            }else{
+                race_data['completed'] = false;
+                race_data['img'] = race.badge_grey;
+                if(joinedResults.indexOf(race.race_name)> -1 ){
+                    race_data['subText'] = "Joined";
+                }else{
+                    if(race.end_date>new Date())
+                        race_data['subText'] = "Open";
+                }
+            }
+            //TODO Remove blank img check
+            if (typeof race.end_date=="object" && race_data["img"]!="" && race_data["img"]!=null){
                 if(badgesData[(race.end_date.getFullYear()).toString()] !== undefined){
                     badgesData[(race.end_date.getFullYear()).toString()].push(race_data);
                 }else{
