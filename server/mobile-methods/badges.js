@@ -5,51 +5,88 @@
 import {VirtualRaces, AllResults} from '/imports/api/collections.js';
 
 Meteor.methods({
-    'badges.getBadges'(badgeType){
-        let condition = {};
-        if (badgeType != 'all')
+    'badges.getBadges'(badgeType, isUserBadges = false){
+       let condition = {};
+        if (badgeType != 'all') {
             condition = {race_type: badgeType}
+        }
+
         let races = VirtualRaces.find(condition,  {sort: {end_date: 1} });
         let racesFetched = races.fetch();
         let racesArr = [];
+        let getVertualRace = [];
         let badgesData = {};
         let raceCategoryMapping = {};
         _.each(racesFetched, (race) => {
             racesArr.push(race.race_name);
+            getVertualRace[race.race_name] = race;
         });
         let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
-        let completedResults = [], joinedResults = [];
+        let completedResults = {
+            "raceName": [],
+            "allResults": [],
+            "virtualRaces": []
+        };
+
+        let joinedResults = [];
         _.each(allResults, (result) => {
+            let oneRace = getVertualRace[result.race];
             if (!isNaN(result.distance) && !isNaN(result.category) && parseInt(result.distance) >= parseInt(result.category)){
-                completedResults.push(result.race);
+                completedResults.raceName.push(result.race);
                 raceCategoryMapping[result.race] = result.category;
-            }
-            else
+            } else {
                 joinedResults.push(result.race)
+            }
+
+            completedResults.allResults.push(result);
+            completedResults.virtualRaces.push(oneRace);
         });
         _.each(racesFetched, (race) => {
             let race_data = {'name': race.race_name, 'type': race.race_type};
 
-            if (completedResults.indexOf(race.race_name)> -1 ){
+            if (completedResults.raceName.indexOf(race.race_name) > -1 ){
                 race_data['img'] = race.badge_color;
                 race_data['subText'] = raceCategoryMapping[race.race_name]+ "KM Finisher";
+                race_data['distance'] = raceCategoryMapping[race.race_name];
                 race_data['completed'] = true;
+                race_data['virtualRaces'] = race;
+                race_data['allResults'] = completedResults.allResults[completedResults.raceName.indexOf(race.race_name)];
+                race_data['status'] = 'completed';
             }else{
                 race_data['completed'] = false;
                 race_data['img'] = race.badge_grey;
+                race_data['virtualRaces'] = race;
+
                 if(joinedResults.indexOf(race.race_name)> -1 ){
                     race_data['subText'] = "Joined";
-                }else{
-                    if(race.end_date>new Date())
+                    race_data['status'] = 'joined';
+                    race_data['allResults'] = completedResults.allResults[completedResults.raceName.indexOf(race.race_name)];
+                } else {
+                    if(race.end_date>new Date()){
+                        race_data['status'] = 'open';
                         race_data['subText'] = "Open";
+                    } else {
+                        race_data['status'] = 'notOpen';
+                    }
                 }
             }
+
             //TODO Remove blank img check
             if (typeof race.end_date=="object" && race_data["img"]!="" && race_data["img"]!=null){
-                if(badgesData[(race.end_date.getFullYear()).toString()] !== undefined){
-                    badgesData[(race.end_date.getFullYear()).toString()].push(race_data);
-                }else{
-                    badgesData[(race.end_date.getFullYear()).toString()] = [race_data];
+
+                if (isUserBadges) {
+                    if(badgesData[(race_data['status'])] !== undefined){
+                        badgesData[race_data['status']].push(race_data);
+                    } else {
+                        badgesData[race_data['status']] = [race_data];
+                    }
+
+                } else {
+                    if(badgesData[(race.end_date.getFullYear()).toString()] !== undefined){
+                        badgesData[(race.end_date.getFullYear()).toString()].push(race_data);
+                    }else{
+                        badgesData[(race.end_date.getFullYear()).toString()] = [race_data];
+                    }
                 }
             }
         });
