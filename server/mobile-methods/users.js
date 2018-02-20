@@ -422,45 +422,67 @@ Meteor.methods({
 
 	'users.joinedRaces' (type, limit = 3, page = 1) {
 
-		let racesArr = [];
-		let currentRaces = {};
+        let racesArr = [];
+        let currentRaces = {};
 
-		let  racesFetched = [];
-		if ( type == 'current') {
-			racesFetched = VirtualRaces.find({ end_date: {$gte: new Date()} }).fetch();
-		} else if ( type == 'past') {
-			racesFetched = VirtualRaces.find( { $and: [{ end_date: { $lt: new Date() }, end_date: { $lt: new Date() } }] } ).fetch();
-		}  else {
-			racesFetched = VirtualRaces.find({}).fetch();
-		}
+        let  racesFetched = [];
+        if ( type == 'current') {
+            racesFetched = VirtualRaces.find({ end_date: {$gte: new Date()} }).fetch();
+        } else if ( type == 'past') {
+            racesFetched = VirtualRaces.find( { $and: [{ end_date: { $lt: new Date() }, end_date: { $lt: new Date() } }] } ).fetch();
+        }  else {
+            racesFetched = VirtualRaces.find({}).fetch();
+        }
 
-		_.each(racesFetched, (race) => {
-			racesArr.push(race.race_name);
-			currentRaces[race.race_name] = race;
-		});
+        _.each(racesFetched, (race) => {
+            racesArr.push(race.race_name);
+            currentRaces[race.race_name] = race;
+        });
 
-		let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
+        let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
 
-		let joinedRaces = [];
-		_.each(allResults, (results, index)=>{
-			let oneRace = currentRaces[results.race];
-			joinedRaces[index] = {
-				virtualRaces: oneRace,
-				allResults: results
-			};
-		});
+        let joinedRaces = [];
+        _.each(allResults, (results, index)=>{
+            let oneRace = currentRaces[results.race];
+            joinedRaces[index] = {
+                virtualRaces: oneRace,
+                allResults: results,
+                end_date: oneRace.end_date,
+                date: new Date()
+            };
+        });
 
-		joinedRaces.sort(function(a,b){
-			return new Date(b.virtualRaces.end_date) - new Date(a.virtualRaces.end_date);
-		});
 
-		let totalCount = joinedRaces;
+        let temp = {
+            current: [],
+            past: []
+        };
+        _.each(joinedRaces, (results, index)=>{
+            if(results.end_date>new Date()){
+                temp.current.push(results)
+            } else {
+                temp.past.push(results)
+            }
 
-		if (limit) {
-			joinedRaces = joinedRaces.slice(((page - 1) * limit), page * limit)
-		}
+        });
 
-		return {data: joinedRaces, totalCount: totalCount};
+        temp.current.sort(function(a,b){
+            return new Date(a.end_date) - new Date(b.end_date);
+        });
+
+        temp.past.sort(function(a,b){
+            return new Date(a.end_date) - new Date(b.end_date);
+        });
+
+        joinedRaces = temp.current.concat(temp.past)
+
+        let totalCount = joinedRaces.length;
+
+        if (limit) {
+            joinedRaces = joinedRaces.slice(((page - 1) * limit), page * limit)
+        }
+
+        return {data: joinedRaces, totalCount: totalCount};
 	},
 
 	'users.followCountByUserId' () {
