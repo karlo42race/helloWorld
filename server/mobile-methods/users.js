@@ -3,28 +3,28 @@ import { AllResults, Following, Notifications, UserMeta, VirtualRaces, Submissio
 
 Meteor.methods({
 	// for client mobile app login via facebook method
-  'users.appLoginWithFacebook'(token) {
-  	console.log(`Logging: users.appLoginWithFacebook, token: ${token}`);
-  	
-  	try {
-      const result = HTTP.call('GET', 'https://graph.facebook.com/v2.5/me?fields=id,name,email,picture&access_token=' + token);
-      email = result['data']['email'];
-      user = Accounts.findUserByEmail(email);
-      if (user != null) {
-        userId = user['_id'];
-        var stampedLoginToken = Accounts._generateStampedLoginToken();
-        Accounts._insertLoginToken(userId, stampedLoginToken);
-        return stampedLoginToken;    
-      } else {
-        console.log(result);
-        return result;
-      };
-    } 
-    catch (e) {
-      console.log(e);
-      return false;
-    };
-  },
+	'users.appLoginWithFacebook'(token) {
+		console.log(`Logging: users.appLoginWithFacebook, token: ${token}`);
+
+		try {
+			const result = HTTP.call('GET', 'https://graph.facebook.com/v2.5/me?fields=id,name,email,picture&access_token=' + token);
+			email = result['data']['email'];
+			user = Accounts.findUserByEmail(email);
+			if (user != null) {
+				userId = user['_id'];
+				var stampedLoginToken = Accounts._generateStampedLoginToken();
+				Accounts._insertLoginToken(userId, stampedLoginToken);
+				return stampedLoginToken;    
+			} else {
+				console.log(result);
+				return result;
+			};
+		} 
+		catch (e) {
+			console.log(e);
+			return false;
+		};
+	},
 
 	// for public user profile
 	'users.getPublicUserData'(publicID) {		
@@ -47,12 +47,12 @@ Meteor.methods({
 		
 		let data = oneUser;
 		Object.assign(data, {
-    	fansCount,
-    	idolCount,
-    	isFollowing    	
-    });
-    
-  	return data;
+			fansCount,
+			idolCount,
+			isFollowing    	
+		});
+
+		return data;
 	},
 	// for user profile page
 	'users.getOwnUserData'() {
@@ -69,8 +69,22 @@ Meteor.methods({
 		let oneUserMeta = UserMeta.findOne({ userID: this.userId }, {fields: {} });
 		let { total_distance, total_timing, submissions_count } = oneUserMeta;
 		let oneUser = Meteor.users.findOne({ _id: this.userId }, { fields: oneUserFields });
-		let fansCount = Following.find({'idol_userID': this.userId}).count();
-		let idolCount = Following.find({'userID': this.userId}).count();	
+		// let fansCount = Following.find({'idol_userID': this.userId}).count();
+		// let idolCount = Following.find({'userID': this.userId}).count();
+
+		let idolData = Following.find({'user_publicID': oneUser.publicID}); 
+		let idolIds = idolData.map(function (c) {  	
+			return c.idol_userID;
+		});
+
+		let fansData = Following.find({'idol_publicID': oneUser.publicID}); 
+		let fansId = fansData.map(function (c) {  	
+			return c.userID;
+		});
+
+		let fansCount = Meteor.users.find({_id: {$in: fansId}}).count();
+		let idolCount = Meteor.users.find({_id: {$in: idolIds}}).count();
+
 
 		let data = oneUser;				
 		
@@ -96,38 +110,38 @@ Meteor.methods({
 				};
 			};
 		});
-        let today = new Date();
-        let currentRaces = VirtualRaces.find({end_date: { $gte: today }},  {sort: {end_date: -1} });
+		let today = new Date();
+		let currentRaces = VirtualRaces.find({end_date: { $gte: today }},  {sort: {end_date: -1} });
 
-        let currentRacesFetched = currentRaces.fetch();
-        let racesArr = [];
-        _.each(currentRacesFetched, (race) => {
-            racesArr.push(race.race_name);
-        });
-        let virtualRaces = [];
-        let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
+		let currentRacesFetched = currentRaces.fetch();
+		let racesArr = [];
+		_.each(currentRacesFetched, (race) => {
+			racesArr.push(race.race_name);
+		});
+		let virtualRaces = [];
+		let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
 		_.each(allResults, (results, index)=>{
 			let oneRace = VirtualRaces.findOne({_id: results.raceID});
 			allResults[index]['badge_grey'] = oneRace.badge_grey;
 			allResults[index]['badge_color'] = oneRace.badge_color;
 			allResults[index]['bib_design'] = oneRace.bib_design;
-            allResults[index]['slug'] = oneRace.slug;
-            allResults[index]['cert_finish'] = oneRace.cert_finish;
+			allResults[index]['slug'] = oneRace.slug;
+			allResults[index]['cert_finish'] = oneRace.cert_finish;
 
 
-        });
-        if (allResults.length<2){
+		});
+		if (allResults.length<2){
 			virtualRaces = currentRacesFetched;
-            virtualRaces = virtualRaces.splice(0, (2 - allResults.length));
-        }else{
-            allResults = allResults.slice(0,2);
+			virtualRaces = virtualRaces.splice(0, (2 - allResults.length));
+		}else{
+			allResults = allResults.slice(0,2);
 		}
-        let options = {
-            limit: 10,
-            sort: {createdAt: -1},
-        };
+		let options = {
+			limit: 10,
+			sort: {createdAt: -1},
+		};
 		let submissions = Submissions.find({}, options).fetch();
-        Object.assign(data, {
+		Object.assign(data, {
 			fansCount,
 			idolCount,
 			total_distance,
@@ -136,43 +150,43 @@ Meteor.methods({
 			allResults,
 			virtualRaces,
 			submissions,
-            badges
+			badges
 
-    });
-    return data;
+		});
+		return data;
 
 	},
 
 	'users.publicSearchUsers'(searchText, limit, skipCount) {
 		var filter = new RegExp(searchText, 'i');
 		let filterBy = { $or: [ 
-								{ 'publicID': parseInt(searchText) }, 
-						  		{ 'profile.first_name': filter }, 
-						  		{ 'profile.last_name': filter }, 
-						  		{ 'profile.name': filter }
-							]}
-		
-		if (searchText == '') {
-			filterBy = {_id: 1234}
-		}
-		
-		let fields = {
-			'profile.name': 1, 
-			'profilePic': 1, 
-			'emails.address':1,
-			'phone':1,	
-			'publicID': 1
-		}
-		var options = {
-			limit: limit,		
-			skip: skipCount,
-			sort: {name: 1},
-			fields: fields
-		};	
+			{ 'publicID': parseInt(searchText) }, 
+			{ 'profile.first_name': filter }, 
+			{ 'profile.last_name': filter }, 
+			{ 'profile.name': filter }
+			]}
+
+			if (searchText == '') {
+				filterBy = {_id: 1234}
+			}
+
+			let fields = {
+				'profile.name': 1, 
+				'profilePic': 1, 
+				'emails.address':1,
+				'phone':1,	
+				'publicID': 1
+			}
+			var options = {
+				limit: limit,		
+				skip: skipCount,
+				sort: {name: 1},
+				fields: fields
+			};	
 
 		// Counts.publish(this, 'dataCount', Meteor.users.find(filterBy), {nonReactive: true});
 		let data = Meteor.users.find( filterBy, options ).fetch();
-	    return  data;
+		return  data;
 	},
 
 	// 'users.publicSearchUsers2'(value, limit) {
@@ -266,9 +280,9 @@ Meteor.methods({
 			let profilePic = oneUser ? oneUser.profilePic : "";
 
 			Object.assign(oneData, {
-	    	profilePic
-	    });
-	    data.push(oneData);
+				profilePic
+			});
+			data.push(oneData);
 		});
 		
 		// set notification flag to false
@@ -345,27 +359,27 @@ Meteor.methods({
 		if(path == 'following') {
 			data = Following.find({'user_publicID': user_publicID}, options); 
 			userIDs = data.map(function (c) {  	
-		    return c.idol_userID;
-		  });
+				return c.idol_userID;
+			});
 		} else if(path == 'followers') {
 			data = Following.find({'idol_publicID': user_publicID}, options); 
 			userIDs = data.map(function (c) {  	
-		    return c.userID;
-		  });
+				return c.userID;
+			});
 		};
 		
 		data = Meteor.users.find({_id: {$in: userIDs}}, {fields: {'profile.name': 1, 'profilePic': 1, 'publicID': 1}}).fetch()  	
-	  
-	  return data;
+
+		return data;
 	},
-    'users.updateLanguage'(lang){
-        Meteor.users.update({
-            _id: this.userId
-        }, {
-            $set: {
-                lang: lang
-            }
-        })
+	'users.updateLanguage'(lang){
+		Meteor.users.update({
+			_id: this.userId
+		}, {
+			$set: {
+				lang: lang
+			}
+		})
 	},
 	'users.getDashboardData'(){
 		let racesArr = [];
@@ -374,17 +388,17 @@ Meteor.methods({
 		let registeredApps = [];
 		let racesFetched = VirtualRaces.find({ end_date: {$gte: new Date()} }, {sort: {start_date: -1} }).fetch();		
 		_.each(racesFetched, (race) => {
-            racesArr.push(race.race_name);
-            currentRaces[race.race_name] = race;
+			racesArr.push(race.race_name);
+			currentRaces[race.race_name] = race;
 		});
 		let joinedRaces = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
 		_.each(joinedRaces, (results, index)=>{
 			let oneRace = currentRaces[results.race];
 			
-            delete currentRaces[results.race];
-            joinedRaces[index]['badge_grey'] = oneRace.badge_grey;
-            joinedRaces[index]['badge_color'] = oneRace.badge_color;
-            joinedRaces[index]['end_date'] = oneRace.end_date;
+			delete currentRaces[results.race];
+			joinedRaces[index]['badge_grey'] = oneRace.badge_grey;
+			joinedRaces[index]['badge_color'] = oneRace.badge_color;
+			joinedRaces[index]['end_date'] = oneRace.end_date;
 		});
 		let allResults = AllResults.find({bib_number: Meteor.user().publicID}).fetch();
 		_.each(allResults, (result)=>{
@@ -417,8 +431,8 @@ Meteor.methods({
 		}
 
 		_.each(racesFetched, (race) => {
-            racesArr.push(race.race_name);
-            currentRaces[race.race_name] = race;
+			racesArr.push(race.race_name);
+			currentRaces[race.race_name] = race;
 		});
 
 		let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
@@ -426,10 +440,10 @@ Meteor.methods({
 		let joinedRaces = [];
 		_.each(allResults, (results, index)=>{
 			let oneRace = currentRaces[results.race];
-            joinedRaces[index] = {
-            	virtualRaces: oneRace,
-            	allResults: results
-            };
+			joinedRaces[index] = {
+				virtualRaces: oneRace,
+				allResults: results
+			};
 		});
 
 		joinedRaces.sort(function(a,b){
@@ -443,6 +457,40 @@ Meteor.methods({
 		}
 
 		return {data: joinedRaces, totalCount: totalCount};
+	},
+
+	'users.followCountByUserId' () {
+		let user_publicID;
+		let user = Meteor.users.findOne({_id: this.userId });
+		console.log(Meteor.users);
+		console.log(user);
+		if(user) {
+			user_publicID = user.publicID;
+		}
+
+		let userIDs = [];
+		let follow = Following.find({'idol_publicID': user_publicID});
+		userIDs = follow.map(function (user) {
+			return user.userID;
+		});
+
+		follow = Meteor.users.find({_id: {$in: userIDs}}, {fields: {'profile.name': 1, 'profilePic': 1, 'publicID': 1}}).count();
+
+		userIDs = []
+		let following = Following.find({'user_publicID': user_publicID});
+		userIDs = following.map(function (user) {
+			return user.idol_userID;
+		});
+
+		following = Meteor.users.find({_id: {$in: userIDs}}, {fields: {'profile.name': 1, 'profilePic': 1, 'publicID': 1}}).count();
+
+
+
+		return {
+			follow: follow,
+			following: following,
+		};
+
 	}
 	
 });
