@@ -80,7 +80,21 @@ Meteor.methods({
 			createdAt: new Date()
 		});
 		console.log('Following: user ', user_publicID, ' followed ', idol_publicID);
-	},	
+	},
+
+	'following.follow'(idol, currentUser) {
+		let { userID, user_publicID} = currentUser;
+		let { idol_userID, idol_publicID} = idol;
+
+		Following.insert({
+			userID,
+			user_publicID,
+			idol_userID,
+			idol_publicID,
+			createdAt: new Date()
+		});
+		console.log('Following: user ', user_publicID, ' followed ', idol_publicID);
+	},		
 
 	'following.remove'(userID, idol_publicID) {
 		let following = Following.findOne({'idol_publicID': idol_publicID, 'userID': userID});	
