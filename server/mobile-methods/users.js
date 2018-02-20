@@ -396,8 +396,12 @@ Meteor.methods({
 			let oneRace = currentRaces[results.race];
 			
 			delete currentRaces[results.race];
+			joinedRaces[index]['race_name'] = oneRace.race_name;
+			joinedRaces[index]['race_name_lang'] = oneRace.race_name_lang;
+			joinedRaces[index]['banner_card'] = oneRace.banner_card;
 			joinedRaces[index]['badge_grey'] = oneRace.badge_grey;
 			joinedRaces[index]['badge_color'] = oneRace.badge_color;
+			joinedRaces[index]['start_date'] = oneRace.start_date;
 			joinedRaces[index]['end_date'] = oneRace.end_date;
 		});
 		let allResults = AllResults.find({bib_number: Meteor.user().publicID}).fetch();
