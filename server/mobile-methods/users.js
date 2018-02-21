@@ -140,13 +140,31 @@ Meteor.methods({
 			limit: 10,
 			sort: {createdAt: -1},
 		};
-		let submissions = Submissions.find({}, options).fetch();
+		let submissions = Submissions.find({user_publicID: oneUser.publicID}, options).fetch();
+		let counts = Submissions.aggregate([
+			{$match: {user_publicID: oneUser.publicID}},
+			{
+				$group: {
+					_id: null,
+					submissions:{
+						$sum: 1
+					},
+					run_total: {
+						$sum: {$cond: {if: {$ne:["$is_post", true]}, then: 1, else: 0}}
+					},
+					
+				}
+			}	
+		]);
+		submissions_count = counts[0]['submissions'];
+		let run_count = counts[0]['run_total'];
 		Object.assign(data, {
 			fansCount,
 			idolCount,
 			total_distance,
 			total_timing,
 			submissions_count,
+			run_count,
 			allResults,
 			virtualRaces,
 			submissions,
