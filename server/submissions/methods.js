@@ -13,8 +13,15 @@ Meteor.methods({
     'submissions.insert'(values) {
         console.log('Logging: submissions insert:');
         console.log(values);
-
-        let { distance, hour, min, sec, url, journal, photo_url, timingInSec, timing_per_km, selectedResultIds, raceID, stravaData } = values;
+        if (values.is_post){
+			values['hour'] = 0;
+			values['min'] = 0;
+			values['sec'] = 0;
+			values['distance']= 0;
+			values['timingInSec'] = 0;
+			values['timing_per_km'] = 0;
+		}
+        let { distance, hour, min, sec, url, journal, photo_url, timingInSec, timing_per_km, selectedResultIds, raceID, stravaData, is_post } = values;
         let summary_polyline = null, map_id = null;
         // check if strava run has aleady been submitted before
         if(stravaData) {
@@ -46,9 +53,10 @@ Meteor.methods({
         distance = Math.round(distance * 100) / 100;
 
         // check timing
-        if (timing_per_km < 100)
-            throw new Meteor.Error('wrong-timing', 'Error: Please check your timing');
-
+        if (!is_post){
+            if (timing_per_km < 100)
+                throw new Meteor.Error('wrong-timing', 'Error: Please check your timing');
+        }
         Submissions.insert({
             user_name,
             userID: this.userId,
@@ -70,7 +78,8 @@ Meteor.methods({
             map_id,
             summary_polyline,
             import_data: stravaData,
-            createdAt: new Date()
+            createdAt: new Date(),
+            is_post,
         }, (err, res) => {
             if (err) {
                 console.log('Submissions: err encountered: ', err);
@@ -88,20 +97,21 @@ Meteor.methods({
                 };
 
                 // fraud alert
-                Meteor.defer(() => {
-                    if(parseInt(timing_per_km) < 240) {
-                        // send email alert to admin for pace < 4:00
-                        let subject = "Potential fraud with pace < 4'00"
-                        sendAdminFraudAlert(values, user_name, user_publicID, subject, res);
-                    }
+                if (!is_post){
+                    Meteor.defer(() => {
+                        if(parseInt(timing_per_km) < 240) {
+                            // send email alert to admin for pace < 4:00
+                            let subject = "Potential fraud with pace < 4'00"
+                            sendAdminFraudAlert(values, user_name, user_publicID, subject, res);
+                        }
 
-                    if(parseInt(timing_per_km) > 1199) {
-                        // send email alert to admin for pace > 20:00 pedometer alert
-                        let subject = "Potential fraud with pace > 20'00"
-                        sendAdminFraudAlert(values, user_name, user_publicID, subject, res);
-                    }
-                });
-
+                        if(parseInt(timing_per_km) > 1199) {
+                            // send email alert to admin for pace > 20:00 pedometer alert
+                            let subject = "Potential fraud with pace > 20'00"
+                            sendAdminFraudAlert(values, user_name, user_publicID, subject, res);
+                        }
+                    });
+                }
             }
         });
         console.log('Submissions: adding submisison by ', this.userId, 'complete');
