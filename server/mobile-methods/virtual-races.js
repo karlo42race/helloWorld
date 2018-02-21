@@ -193,6 +193,31 @@ Meteor.methods({
             return b.end_date - a.end_date;
         });
         return raceData;
+    },
+
+    'virtualRaces.getCurrentRaces'(){   
+        let today = new Date();
+        let raceData = [];
+        let races = VirtualRaces.find({ end_date: {$gte: today}, hide_banner_on_dashboard:"show"},  {sort: {end_date: -1} });
+        let racesFetched = races.fetch();
+        let racesArr = [];
+        let allResultVirtualRace = {};
+        _.each(racesFetched, (race) => {
+            racesArr.push(race.race_name);
+            allResultVirtualRace[race.race_name] = race;
+        });
+        let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
+        _.each(allResults, (results, index)=>{
+            delete allResultVirtualRace[results.race];
+        });
+        _.each(allResultVirtualRace, (race)=>{
+            raceData.push(race)
+        });
+    
+        raceData.sort(function(a,b){
+            return b.end_date - a.end_date;
+        });
+        return raceData;
     }
 
 });
