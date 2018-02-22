@@ -2,11 +2,11 @@
  * Created by sheeraz on 18/1/18.
  */
 
-import {VirtualRaces, AllResults} from '/imports/api/collections.js';
+ import {VirtualRaces, AllResults} from '/imports/api/collections.js';
 
-Meteor.methods({
+ Meteor.methods({
     'badges.getBadges'(badgeType, isUserBadges = false){
-       let condition = {};
+        let condition = {};
         if (badgeType != 'all') {
             condition = {race_type: badgeType}
         }
@@ -52,6 +52,7 @@ Meteor.methods({
                 race_data['virtualRaces'] = race;
                 race_data['allResults'] = completedResults.allResults[completedResults.raceName.indexOf(race.race_name)];
                 race_data['status'] = 'completed';
+
             }else{
                 race_data['completed'] = false;
                 race_data['img'] = race.badge_grey;
@@ -90,6 +91,67 @@ Meteor.methods({
                 }
             }
         });
+
+
+        let completeCurrentRace = {};
+
+        _.each(badgesData.completed, (data) => {
+            completeCurrentRace = data;
+            if (moment(data.virtualRaces.end_date) > moment(new Date()) ) {
+                completeCurrentRace.status = "current race"
+                if (badgesData.currentComplete !== undefined) {
+                    badgesData["currentComplete"].push(completeCurrentRace);
+                } else {
+                    badgesData["currentComplete"] = [completeCurrentRace];
+                }
+            } else {
+                completeCurrentRace.status = "past race"
+                if (badgesData.pastComplete !== undefined) {
+                    badgesData["pastComplete"].push(completeCurrentRace);
+                } else {
+                    badgesData["pastComplete"] = [completeCurrentRace];
+                }
+            }
+        })
+
+
+        if (badgesData.completed) {
+            badgesData.completed.sort(function(a,b){
+                return new Date(b.virtualRaces.end_date) - new Date(a.virtualRaces.end_date);
+            });
+        }
+
+        if (badgesData.joined) {
+            badgesData.joined.sort(function(a,b){
+                return new Date(b.virtualRaces.end_date) - new Date(a.virtualRaces.end_date);
+            });
+        }
+
+        if (badgesData.open) {
+            badgesData.open.sort(function(a,b){
+                return new Date(b.virtualRaces.end_date) - new Date(a.virtualRaces.end_date);
+            });
+        }
+
+        if (badgesData.currentComplete) {
+            badgesData.currentComplete.sort(function(a,b){
+                return new Date(b.virtualRaces.end_date) - new Date(a.virtualRaces.end_date);
+            });
+        }
+
+        if (badgesData.pastComplete) {
+            badgesData.pastComplete.sort(function(a,b){
+                return new Date(b.virtualRaces.end_date) - new Date(a.virtualRaces.end_date);
+            });
+        }
+
+        if (badgesData.notOpen) {
+            badgesData.notOpen.sort(function(a,b){
+                return new Date(b.virtualRaces.end_date) - new Date(a.virtualRaces.end_date);
+            });
+        }
+
+
         return badgesData;
     },
     'badges.getDetails'(race_name){
