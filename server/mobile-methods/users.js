@@ -70,7 +70,9 @@ Meteor.methods({
 		let { total_distance, total_timing, submissions_count } = oneUserMeta;
 		let oneUser = Meteor.users.findOne({ _id: this.userId }, { fields: oneUserFields });
 		// let fansCount = Following.find({'idol_userID': this.userId}).count();
-		// let idolCount = Following.find({'userID': this.userId}).count();
+		// let idolCount = Following.find({'userID': this.userId}).count();	
+
+		console.log(oneUser.publicID);
 
 		let idolData = Following.find({'user_publicID': oneUser.publicID}); 
 		let idolIds = idolData.map(function (c) {  	
@@ -155,9 +157,11 @@ Meteor.methods({
 					
 				}
 			}	
-		]);
-		submissions_count = counts[0]['submissions'];
-		let run_count = counts[0]['run_total'];
+			]);
+	
+		submissions_count = counts.length && counts[0]['submissions'] ? counts[0]['submissions'] : 0;
+		let run_count = counts.length && counts[0]['run_total'] ? counts[0]['run_total'] : 0;
+		
 		Object.assign(data, {
 			fansCount,
 			idolCount,
@@ -440,67 +444,67 @@ Meteor.methods({
 
 	'users.joinedRaces' (type, limit = 3, page = 1) {
 
-        let racesArr = [];
-        let currentRaces = {};
+		let racesArr = [];
+		let currentRaces = {};
 
-        let  racesFetched = [];
-        if ( type == 'current') {
-            racesFetched = VirtualRaces.find({ end_date: {$gte: new Date()} }).fetch();
-        } else if ( type == 'past') {
-            racesFetched = VirtualRaces.find( { $and: [{ end_date: { $lt: new Date() }, end_date: { $lt: new Date() } }] } ).fetch();
-        }  else {
-            racesFetched = VirtualRaces.find({}).fetch();
-        }
+		let  racesFetched = [];
+		if ( type == 'current') {
+			racesFetched = VirtualRaces.find({ end_date: {$gte: new Date()} }).fetch();
+		} else if ( type == 'past') {
+			racesFetched = VirtualRaces.find( { $and: [{ end_date: { $lt: new Date() }, end_date: { $lt: new Date() } }] } ).fetch();
+		}  else {
+			racesFetched = VirtualRaces.find({}).fetch();
+		}
 
-        _.each(racesFetched, (race) => {
-            racesArr.push(race.race_name);
-            currentRaces[race.race_name] = race;
-        });
+		_.each(racesFetched, (race) => {
+			racesArr.push(race.race_name);
+			currentRaces[race.race_name] = race;
+		});
 
-        let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
+		let allResults = AllResults.find({ $and: [{ race: {$in: racesArr}, userID: this.userId }] }).fetch();
 
-        let joinedRaces = [];
-        _.each(allResults, (results, index)=>{
-            let oneRace = currentRaces[results.race];
-            joinedRaces[index] = {
-                virtualRaces: oneRace,
-                allResults: results,
-                end_date: oneRace.end_date,
-                date: new Date()
-            };
-        });
+		let joinedRaces = [];
+		_.each(allResults, (results, index)=>{
+			let oneRace = currentRaces[results.race];
+			joinedRaces[index] = {
+				virtualRaces: oneRace,
+				allResults: results,
+				end_date: oneRace.end_date,
+				date: new Date()
+			};
+		});
 
 
-        let temp = {
-            current: [],
-            past: []
-        };
-        _.each(joinedRaces, (results, index)=>{
-            if(results.end_date>new Date()){
-                temp.current.push(results)
-            } else {
-                temp.past.push(results)
-            }
+		let temp = {
+			current: [],
+			past: []
+		};
+		_.each(joinedRaces, (results, index)=>{
+			if(results.end_date>new Date()){
+				temp.current.push(results)
+			} else {
+				temp.past.push(results)
+			}
 
-        });
+		});
 
-        temp.current.sort(function(a,b){
-            return new Date(a.end_date) - new Date(b.end_date);
-        });
+		temp.current.sort(function(a,b){
+			return new Date(a.end_date) - new Date(b.end_date);
+		});
 
-        temp.past.sort(function(a,b){
-            return new Date(a.end_date) - new Date(b.end_date);
-        });
+		temp.past.sort(function(a,b){
+			return new Date(a.end_date) - new Date(b.end_date);
+		});
 
-        joinedRaces = temp.current.concat(temp.past)
+		joinedRaces = temp.current.concat(temp.past)
 
-        let totalCount = joinedRaces.length;
+		let totalCount = joinedRaces.length;
 
-        if (limit) {
-            joinedRaces = joinedRaces.slice(((page - 1) * limit), page * limit)
-        }
+		if (limit) {
+			joinedRaces = joinedRaces.slice(((page - 1) * limit), page * limit)
+		}
 
-        return {data: joinedRaces, totalCount: totalCount};
+		return {data: joinedRaces, totalCount: totalCount};
 	},
 
 	'users.followCountByUserId' () {
