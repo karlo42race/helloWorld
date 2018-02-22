@@ -64,7 +64,7 @@ Meteor.methods({
 			'message': 1,
 			'roles': 1,
 			'bannerImg': 1,
-			'address.country': 1,
+			'address.country': 1, 
 		}
 		let oneUserMeta = UserMeta.findOne({ userID: this.userId }, {fields: {} });
 		let { total_distance, total_timing, submissions_count } = oneUserMeta;

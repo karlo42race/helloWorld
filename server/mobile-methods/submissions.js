@@ -12,10 +12,10 @@ Meteor.methods({
 		let data = [], submissions = [];
 
 		const pushOneData = (c) => {
-		 	let oneUser = Meteor.users.findOne({_id: c.userID});		 	
-		 	let oneData = {
-		 		_id: c._id,
-		 		user_name: c.user_name, 
+			let oneUser = Meteor.users.findOne({_id: c.userID});
+			let oneData = {
+				_id: c._id,
+				user_name: c.user_name, 
 				userID: c.userID,
 				user_publicID: c.user_publicID,
 				distance: c.distance,
@@ -32,8 +32,9 @@ Meteor.methods({
 				summary_polyline: c.summary_polyline,
 				comments: c.comments,
 				createdAt: c.createdAt,
-				profilePic: oneUser.profilePic				
-		 	};
+				profilePic: oneUser.profilePic,	
+				liked : c.cheers.indexOf(this.userID) != -1		
+			};
 			
 			data.push(oneData);
 		};
@@ -44,11 +45,11 @@ Meteor.methods({
 			submissions = Submissions.find({photo_url: {$not: { $eq: ""}  } }, options).fetch();
 		} else if(type == 'following') {
 			let followings = Following.find({userID: this.userId});
-		 	let idol_userIDs = followings.map(function (following) {  	
-		    return following.idol_userID;
-		  });
+			let idol_userIDs = followings.map(function (following) {  	
+				return following.idol_userID;
+			});
 
-		  submissions = Submissions.find({userID: {$in: idol_userIDs} }, options).fetch();	
+			submissions = Submissions.find({userID: {$in: idol_userIDs} }, options).fetch();	
 		};
 
 		_.each(submissions, (c) => {
@@ -101,8 +102,64 @@ Meteor.methods({
 		return topics;
 	},
 	'submissions.getOneRaceSubmissions'(race){
-        let oneResult = AllResults.findOne({userID: this.userId, race: race});
-        let submissionsID = oneResult ? oneResult.submissions : [];
-        return Submissions.find({_id: {$in: submissionsID} }).fetch();
-    }
+		let oneResult = AllResults.findOne({userID: this.userId, race: race});
+		let submissionsID = oneResult ? oneResult.submissions : [];
+		return Submissions.find({_id: {$in: submissionsID} }).fetch();
+	},
+	'submissions.report'(submissionID, type){
+		let submission = Submissions.findOne({_id: submissionID});
+		let reportedUser = Meteor.users.findOne({_id: submission.userID});
+		let reportingUser = Meteor.users.findOne({_id: this.userId});
+		let values = {
+			reportingUser: {
+				name: reportingUser.profile.name,
+				email: reportingUser.emails[0]['address'],
+				publicId: reportingUser.publicID
+			},
+			reportedUser: {
+				name: reportedUser.profile.name,
+				publicId: reportedUser.publicID,
+				email: reportedUser.emails[0]['address'],
+				timestamp: submission.createdAt.toString(),
+				postId: submission._id
+			},
+			type,
+			subject: "Potential "+type+" submission"
+		};
+		sendAdminReportSubmission(values);
+	},
+	'submission.getTrendingTags'(dataLimit, skipCount){
+		let options = {
+			sort: {count: -1},
+			skip: skipCount,
+			limit: dataLimit,
+		};
+		let trendingFeed = FeedsTopics.find({isActive: true}, options).fetch();
+		return trendingFeed;
+	},
+	'submission.getPostByTag'(tag, dataLimit, skipCount){
+		let options = {
+			sort: {createdAt: -1},
+			skip: skipCount,
+			limit: dataLimit,
+		};
+		let submissionsCount = Submissions.find({selectedTags: tag}).count();
+		let submissions = Submissions.find({selectedTags: tag}, options).fetch();
+
+
+		_.each(submissions, (c) => {
+			let oneUser = Meteor.users.findOne({_id: c.userID});
+			c["profilePic"] = oneUser.profilePic;
+			c["liked"] = c.cheers.indexOf(this.userID) != -1;
+		}); 
+
+		
+		
+		return {
+			totalCount: submissionsCount,
+			submissions,
+			tagName: tag
+		}
+
+	}
 });
