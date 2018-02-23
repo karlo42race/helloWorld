@@ -10,9 +10,9 @@ Meteor.methods({
 			sort: {createdAt: -1},
 		};
 		let data = [], submissions = [];
-
 		const pushOneData = (c) => {
 			let oneUser = Meteor.users.findOne({_id: c.userID});
+			let follow = Following.findOne({'userID': this.userId, 'idol_userID': c.userID}, {fields:{idol_userID: 1}});
 			let oneData = {
 				_id: c._id,
 				user_name: c.user_name, 
@@ -33,7 +33,8 @@ Meteor.methods({
 				comments: c.comments,
 				createdAt: c.createdAt,
 				profilePic: oneUser.profilePic,	
-				liked : c.cheers.indexOf(this.userID) != -1		
+				liked : c.cheers.indexOf(this.userId) != -1,
+				follow : follow ? true : false		
 			};
 			
 			data.push(oneData);
