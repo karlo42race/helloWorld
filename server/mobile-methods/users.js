@@ -158,7 +158,7 @@ Meteor.methods({
 				}
 			}	
 			]);
-	
+
 		submissions_count = counts.length && counts[0]['submissions'] ? counts[0]['submissions'] : 0;
 		let run_count = counts.length && counts[0]['run_total'] ? counts[0]['run_total'] : 0;
 		
@@ -539,6 +539,15 @@ Meteor.methods({
 			following: following,
 		};
 
+	},
+	'users.getLikesInfo'(userIDs) {	
+		let data = Meteor.users.find({_id: {$in: userIDs}}, {fields: {'profile': 1, 'profilePic': 1, 'publicID': 1, '_id' : 1}}).fetch();
+		let follow = Following.find({'userID': this.userId});
+		_.each(data, (user)=>{
+			user["follow"] = follow.indexOf(user) != -1 ? "following" : "follow";
+		});
+
+		return data;
 	}
 	
 });
